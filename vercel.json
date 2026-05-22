@@ -1,0 +1,56 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
+  "framework": "nextjs",
+
+  "regions": ["iad1"],
+
+  "buildCommand": "next build",
+  "installCommand": "npm install --legacy-peer-deps",
+
+  "functions": {
+    "src/app/api/conversations/[id]/messages/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "src/app/api/ai/extract-tasks/route.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "src/app/api/health/route.ts": {
+      "maxDuration": 10,
+      "memory": 256
+    }
+  },
+
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "*/15 * * * *"
+    }
+  ],
+
+  "headers": [
+    {
+      "source": "/favicon.svg",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(_next/image|_next/data)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ],
+
+  "cleanUrls": true,
+  "trailingSlash": false
+}
