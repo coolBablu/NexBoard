@@ -25,13 +25,27 @@ const cached: MongooseCache =
   global._mongooseCache ?? (global._mongooseCache = { conn: null, promise: null });
 
 async function resolveUri(): Promise<string> {
+  // On Vercel (serverless), in-memory MongoDB cannot run — there is no
+  // persistent fs to cache the binary and the function cannot spawn a
+  // long-lived mongod process. Require a real connection string instead.
+  if (isDemoMode() && process.env.VERCEL) {
+    const uri = process.env.MONGODB_URI;
+    if (uri) return uri;
+    throw new Error(
+      "Demo mode is local-only. Set MONGODB_URI to a MongoDB Atlas connection string on Vercel " +
+        "and either unset DEMO_MODE or leave it enabled to keep the seeded data on first boot. " +
+        "See DEPLOYMENT.md for the 5-minute Atlas setup."
+    );
+  }
+
   if (isDemoMode()) {
     return getDemoMongoUri();
   }
+
   const uri = process.env.MONGODB_URI;
   if (!uri) {
     throw new Error(
-      "MONGODB_URI is not set. Add it to .env.local, or set DEMO_MODE=true to use in-memory MongoDB."
+      "MONGODB_URI is not set. Add it to .env.local, or set DEMO_MODE=true to use in-memory MongoDB (local only)."
     );
   }
   return uri;

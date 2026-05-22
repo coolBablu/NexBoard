@@ -14,12 +14,27 @@ export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
 
   // Validate environment FIRST so a misconfigured deploy fails loudly
-  // at boot, not at the first request. Throws and surfaces in Vercel
-  // build / runtime logs with a readable error summary.
-  await import("./lib/env");
+  // at boot, not at the first request. Wrapped in try-catch so a bad
+  // env config never crashes the serverless function boot — instead the
+  // error is logged once and DB-backed routes surface a clean 503.
+  try {
+    await import("./lib/env");
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("[instrumentation] env validation failed:", err);
+  }
 
-  if (process.env.DEMO_MODE === "true") {
-    const { getDemoMongoUri } = await import("./lib/demo-mongo");
-    await getDemoMongoUri({ initialize: true });
+  // mongodb-memory-server cannot run inside a Vercel serverless function
+  // (no persistent fs, restricted egress, binary download not possible).
+  // Skip the spawn so DB-backed routes degrade cleanly with a helpful
+  // error instead of taking the whole runtime down with a boot crash.
+  if (process.env.DEMO_MODE === "true" && !process.env.VERCEL) {
+    try {
+      const { getDemoMongoUri } = await import("./lib/demo-mongo");
+      await getDemoMongoUri({ initialize: true });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[instrumentation] demo-mongo failed to start:", err);
+    }
   }
 }
