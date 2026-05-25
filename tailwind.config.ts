@@ -91,9 +91,10 @@ const config: Config = {
           "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")",
       },
       boxShadow: {
-        glow: "0 8px 32px -10px rgba(94,106,210,0.35)",
-        "glow-cyan": "0 8px 32px -10px rgba(14,165,233,0.30)",
-        "glow-fuchsia": "0 8px 32px -10px rgba(79,70,229,0.30)",
+        // Light-mode friendly elevation glows — soft and short.
+        glow: "0 6px 20px -10px rgba(94,106,210,0.18)",
+        "glow-cyan": "0 6px 20px -10px rgba(14,165,233,0.16)",
+        "glow-fuchsia": "0 6px 20px -10px rgba(79,70,229,0.16)",
         "inner-glow": "inset 0 1px 0 0 rgba(255,255,255,0.7)",
       },
       keyframes: {

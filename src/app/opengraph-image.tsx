@@ -44,7 +44,7 @@ export default async function OpenGraphImage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 32px rgba(94, 106, 210,0.6)",
+              boxShadow: "0 8px 32px rgba(94, 106, 210, 0.15)",
               fontSize: 28,
               fontWeight: 700,
               color: "white",

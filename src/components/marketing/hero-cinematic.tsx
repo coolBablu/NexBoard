@@ -369,7 +369,7 @@ function FloatingChips() {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(94, 106, 210,0.4)]"
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(94, 106, 210, 0.10)]"
           >
             {c.content}
           </motion.div>

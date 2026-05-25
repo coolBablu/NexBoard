@@ -178,7 +178,7 @@ function FloatCard({
     <motion.div
       style={style}
       className={
-        "glass absolute z-10 rounded-2xl p-3 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] " +
+        "glass absolute z-10 rounded-2xl p-3 shadow-[0_20px_60px_-15px_rgba(15, 23, 42, 0.08)] " +
         className
       }
       animate={{ y: [0, -6, 0] }}

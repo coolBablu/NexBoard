@@ -33,7 +33,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         }
         className={cn(
           "relative isolate overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl",
-          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_12px_40px_-12px_rgba(0,0,0,0.6)]",
+          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_12px_40px_-12px_rgba(15, 23, 42, 0.08)]",
           "transition-colors duration-300",
           hover && "hover:border-white/[0.14] hover:bg-white/[0.05]",
           glowMap[glow],

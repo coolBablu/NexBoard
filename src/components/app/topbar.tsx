@@ -53,7 +53,7 @@ export function Topbar({
       className={cn(
         "sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/60 px-4 backdrop-blur-2xl transition-[border-color,box-shadow] duration-300 sm:px-6",
         scrolled
-          ? "border-white/[0.1] shadow-[0_4px_24px_-12px_rgba(0,0,0,0.6)]"
+          ? "border-white/[0.1] shadow-[0_4px_24px_-12px_rgba(15, 23, 42, 0.08)]"
           : "border-white/[0.04]"
       )}
     >

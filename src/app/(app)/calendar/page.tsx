@@ -238,7 +238,7 @@ export default function CalendarPage() {
                       isToday && !isSelected &&
                         "border border-violet-500/40 bg-gradient-to-br from-violet-500/15 to-cyan-500/10 text-foreground",
                       isSelected &&
-                        "border border-violet-400/60 bg-nova-gradient/15 text-foreground shadow-[0_0_24px_-8px_rgba(94, 106, 210,0.7)]"
+                        "border border-violet-400/60 bg-nova-gradient/15 text-foreground shadow-[0_0_24px_-8px_rgba(94, 106, 210, 0.18)]"
                     )}
                   >
                     <div className="font-mono text-xs font-medium leading-none">

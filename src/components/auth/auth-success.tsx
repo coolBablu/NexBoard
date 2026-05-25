@@ -49,7 +49,7 @@ export function AuthSuccess({ title, description, actions }: AuthSuccessProps) {
             damping: 18,
             delay: 0.1,
           }}
-          className="relative grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-emerald-400 via-cyan-400 to-violet-400 shadow-[0_0_40px_-8px_rgba(52,211,153,0.7)]"
+          className="relative grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-emerald-400 via-cyan-400 to-violet-400 shadow-[0_0_40px_-8px_rgba(16, 185, 129, 0.18)]"
         >
           <motion.span
             initial={{ pathLength: 0, opacity: 0 }}

@@ -429,7 +429,7 @@ function FloatingSideCards() {
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="rotate-[-4deg] rounded-2xl border border-white/[0.1] bg-white/[0.04] p-3 shadow-[0_20px_60px_-20px_rgba(94, 106, 210,0.5)] backdrop-blur-xl"
+          className="rotate-[-4deg] rounded-2xl border border-white/[0.1] bg-white/[0.04] p-3 shadow-[0_20px_60px_-20px_rgba(94, 106, 210, 0.12)] backdrop-blur-xl"
         >
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
             Anomaly detected
@@ -474,7 +474,7 @@ function FloatingSideCards() {
             ease: "easeInOut",
             delay: 1,
           }}
-          className="rotate-[3deg] rounded-2xl border border-white/[0.1] bg-white/[0.04] p-3 shadow-[0_20px_60px_-20px_rgba(14, 165, 233,0.5)] backdrop-blur-xl"
+          className="rotate-[3deg] rounded-2xl border border-white/[0.1] bg-white/[0.04] p-3 shadow-[0_20px_60px_-20px_rgba(14, 165, 233, 0.12)] backdrop-blur-xl"
         >
           <div className="flex items-center gap-2">
             <div className="grid h-7 w-7 place-items-center rounded-lg bg-nova-gradient">

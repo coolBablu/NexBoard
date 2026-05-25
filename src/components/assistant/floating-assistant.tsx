@@ -152,7 +152,7 @@ export function FloatingAssistant() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.95 }}
         className={cn(
-          "fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-2xl bg-nova-gradient text-white shadow-[0_18px_40px_-12px_rgba(94, 106, 210,0.7)] sm:bottom-6 sm:right-6",
+          "fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-2xl bg-nova-gradient text-white shadow-[0_18px_40px_-12px_rgba(94, 106, 210, 0.18)] sm:bottom-6 sm:right-6",
           open && "pointer-events-none opacity-0"
         )}
         aria-label="Open Nova assistant"
@@ -172,7 +172,7 @@ export function FloatingAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 320, damping: 28 }}
-            className="fixed bottom-5 right-5 z-40 flex h-[min(680px,calc(100vh-2.5rem))] w-[min(420px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-background/85 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] backdrop-blur-2xl sm:bottom-6 sm:right-6"
+            className="fixed bottom-5 right-5 z-40 flex h-[min(680px,calc(100vh-2.5rem))] w-[min(420px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-background/85 shadow-[0_30px_80px_-20px_rgba(15, 23, 42, 0.08)] backdrop-blur-2xl sm:bottom-6 sm:right-6"
             role="dialog"
             aria-label="Nova assistant"
           >

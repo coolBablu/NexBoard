@@ -82,7 +82,7 @@ export function RevenueChart() {
               tickFormatter={(v) => `$${v}k`}
             />
             <Tooltip
-              cursor={{ stroke: "rgba(94, 106, 210,0.4)", strokeWidth: 1 }}
+              cursor={{ stroke: "rgba(94, 106, 210, 0.10)", strokeWidth: 1 }}
               contentStyle={{
                 background: "rgba(15,14,20,0.9)",
                 border: "1px solid rgba(255,255,255,0.08)",

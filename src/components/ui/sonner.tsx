@@ -21,7 +21,7 @@ export function Toaster() {
         unstyled: false,
         classNames: {
           toast:
-            "group pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-white/10 bg-background/90 px-4 py-3 text-sm text-foreground shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur-2xl",
+            "group pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-white/10 bg-background/90 px-4 py-3 text-sm text-foreground shadow-[0_20px_60px_-20px_rgba(15, 23, 42, 0.10)] backdrop-blur-2xl",
           title: "font-medium text-foreground leading-tight",
           description: "text-xs text-muted-foreground mt-0.5",
           actionButton:

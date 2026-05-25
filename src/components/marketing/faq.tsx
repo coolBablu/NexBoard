@@ -130,7 +130,7 @@ export function FAQ() {
                     className={cn(
                       "relative overflow-hidden rounded-2xl border bg-white/[0.02] backdrop-blur-xl transition-all",
                       isOpen
-                        ? "border-white/[0.12] shadow-[0_20px_60px_-20px_rgba(94, 106, 210,0.35)]"
+                        ? "border-white/[0.12] shadow-[0_20px_60px_-20px_rgba(94, 106, 210, 0.09)]"
                         : "border-white/[0.07] hover:border-white/[0.12]"
                     )}
                   >

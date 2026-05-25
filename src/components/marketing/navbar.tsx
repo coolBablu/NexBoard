@@ -36,7 +36,7 @@ export function MarketingNavbar() {
         className={cn(
           "flex w-full max-w-6xl items-center justify-between rounded-2xl border px-3 py-2.5 transition-all duration-500",
           scrolled
-            ? "border-white/10 bg-background/70 backdrop-blur-2xl shadow-[0_10px_40px_-12px_rgba(0,0,0,0.5)]"
+            ? "border-white/10 bg-background/70 backdrop-blur-2xl shadow-[0_10px_40px_-12px_rgba(15, 23, 42, 0.06)]"
             : "border-transparent bg-transparent"
         )}
       >

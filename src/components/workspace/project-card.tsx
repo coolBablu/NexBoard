@@ -51,7 +51,7 @@ export function ProjectCard({
           <div className="flex items-start justify-between">
             <div
               className={
-                "grid h-11 w-11 place-items-center rounded-xl shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)] " +
+                "grid h-11 w-11 place-items-center rounded-xl shadow-[0_8px_24px_-12px_rgba(15, 23, 42, 0.08)] " +
                 color
               }
             >

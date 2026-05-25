@@ -283,7 +283,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             {/* Subtle gradient halo */}
             <div className="pointer-events-none absolute -inset-1 rounded-[20px] bg-[conic-gradient(from_120deg_at_50%_50%,#8b5cf640,#22d3ee40,#d946ef40,#8b5cf640)] blur-2xl opacity-60" />
 
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/85 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-background/85 shadow-[0_30px_80px_-20px_rgba(15, 23, 42, 0.08)] backdrop-blur-2xl">
               {/* Input row */}
               <div className="flex items-center gap-3 border-b border-white/[0.07] px-4">
                 <Search className="size-4 text-muted-foreground" />

@@ -77,7 +77,7 @@ export function MetricTile({
       className="group relative isolate flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl"
       style={{
         boxShadow:
-          "inset 0 1px 0 0 rgba(255,255,255,0.04), 0 12px 40px -16px rgba(0,0,0,0.6)",
+          "inset 0 1px 0 0 rgba(255,255,255,0.04), 0 12px 40px -16px rgba(15, 23, 42, 0.08)",
       }}
     >
       {/* Soft top-left glow on hover */}
