@@ -437,19 +437,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   );
 }
 
-/**
- * Global hook: wire ⌘K / Ctrl+K to a state-setter.
- * Mount once anywhere in the tree.
- */
-export function useCommandPaletteShortcut(setOpen: (b: boolean) => void) {
-  React.useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
-        e.preventDefault();
-        setOpen(true);
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [setOpen]);
-}
+// `useCommandPaletteShortcut` lives in `./use-command-shortcut` so that
+// shell-level callers don't pull this entire heavy module.
+export { useCommandPaletteShortcut } from "./use-command-shortcut";

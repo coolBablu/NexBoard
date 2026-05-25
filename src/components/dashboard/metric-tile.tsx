@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import {
   motion,
   useInView,
@@ -8,8 +9,16 @@ import {
   useSpring,
 } from "framer-motion";
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer } from "recharts";
+import { SparkSkeleton } from "@/components/charts/chart-skeleton";
 import { cn } from "@/lib/utils";
+
+// Defer Recharts (and its ~85 kB gzipped baseline) until after the tile
+// is on screen. Falls back to a soft gradient placeholder so the layout
+// is stable on first paint.
+const MetricSpark = dynamic(() => import("./metric-spark"), {
+  ssr: false,
+  loading: () => <SparkSkeleton />,
+});
 
 interface MetricTileProps {
   label: string;
@@ -115,29 +124,7 @@ export function MetricTile({
 
       {/* Sparkline */}
       <div className="relative mt-auto h-14">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={data}
-            margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-          >
-            <defs>
-              <linearGradient id={`mg-${id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={a.stroke} stopOpacity={0.45} />
-                <stop offset="100%" stopColor={a.stroke} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Area
-              type="monotone"
-              dataKey="v"
-              stroke={a.stroke}
-              strokeWidth={1.5}
-              fill={`url(#mg-${id})`}
-              isAnimationActive
-              animationDuration={1100}
-              animationEasing="ease-out"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <MetricSpark data={data} stroke={a.stroke} gradientId={`mg-${id}`} />
         {/* Hairline bottom accent on hover */}
         <span
           aria-hidden

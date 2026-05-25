@@ -20,8 +20,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <SWRConfig
         value={{
           fetcher,
+          // Avoid refetch storms on tab focus / network reconnect — the
+          // app polls explicitly where it matters (notifications, chat).
           revalidateOnFocus: false,
+          revalidateOnReconnect: false,
           shouldRetryOnError: false,
+          // Coalesce duplicate calls to the same key into a single fetch.
+          dedupingInterval: 30_000,
+          // Throttle in case any code path still triggers focus revals.
+          focusThrottleInterval: 60_000,
+          // Keep previously-fetched data on screen while a refetch is in
+          // flight — eliminates the "blank skeleton flash" on navigation.
+          keepPreviousData: true,
         }}
       >
         {children}

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   ArrowUpRight,
   Calendar,
@@ -21,10 +22,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { BigAreaChart } from "@/components/analytics/big-area-chart";
-import { FunnelBars } from "@/components/analytics/funnel-bars";
-import { RetentionLine } from "@/components/analytics/retention-line";
-import { SourceDonut } from "@/components/analytics/source-donut";
+import { ChartSkeleton } from "@/components/charts/chart-skeleton";
+
+// Defer Recharts-heavy chart components — each ships its own slice of
+// the ~85 kB Recharts baseline. Splitting them keeps /analytics's
+// initial bundle small and lets the KPI strip paint immediately.
+const BigAreaChart = dynamic(
+  () => import("@/components/analytics/big-area-chart").then((m) => m.BigAreaChart),
+  { ssr: false, loading: () => <ChartSkeleton height={340} /> }
+);
+const FunnelBars = dynamic(
+  () => import("@/components/analytics/funnel-bars").then((m) => m.FunnelBars),
+  { ssr: false, loading: () => <ChartSkeleton height={280} /> }
+);
+const RetentionLine = dynamic(
+  () => import("@/components/analytics/retention-line").then((m) => m.RetentionLine),
+  { ssr: false, loading: () => <ChartSkeleton height={280} /> }
+);
+const SourceDonut = dynamic(
+  () => import("@/components/analytics/source-donut").then((m) => m.SourceDonut),
+  { ssr: false, loading: () => <ChartSkeleton height={280} /> }
+);
 
 const topCountries = [
   { country: "United States", flag: "🇺🇸", users: 5283, share: 42 },

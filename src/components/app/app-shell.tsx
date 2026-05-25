@@ -1,15 +1,31 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
-import {
-  CommandPalette,
-  useCommandPaletteShortcut,
-} from "@/components/dashboard/command-palette";
-import { FloatingAssistant } from "@/components/assistant/floating-assistant";
+import { useCommandPaletteShortcut } from "@/components/dashboard/use-command-shortcut";
 import { usePresenceHeartbeat } from "@/components/team/presence";
 import { cn } from "@/lib/utils";
+
+// Defer heavy off-screen UI until the user actually opens it. Both
+// trees pull in `cmdk`, framer-motion, react-markdown, and
+// react-syntax-highlighter — collectively ~100 kB that shouldn't
+// block first paint on every authenticated page.
+const CommandPalette = dynamic(
+  () =>
+    import("@/components/dashboard/command-palette").then(
+      (m) => m.CommandPalette
+    ),
+  { ssr: false }
+);
+const FloatingAssistant = dynamic(
+  () =>
+    import("@/components/assistant/floating-assistant").then(
+      (m) => m.FloatingAssistant
+    ),
+  { ssr: false }
+);
 
 interface AppShellProps {
   children: React.ReactNode;
