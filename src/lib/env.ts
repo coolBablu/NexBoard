@@ -62,6 +62,8 @@ const envSchema = z
     // ── AI ─────────────────────────────────────────────────────
     OPENAI_API_KEY: z.string().optional(),
     OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+    OPENROUTER_API_KEY: z.string().optional(),
+    OPENROUTER_MODEL: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     // Production-only invariants (skip in test + dev).

@@ -24,6 +24,7 @@ export type AIKind = (typeof AI_KINDS)[number];
 
 export const AI_PROVIDERS = [
   "openai",
+  "openrouter",
   "anthropic",
   "google",
   "local",

@@ -1,13 +1,16 @@
 /**
- * OpenAI streaming wrapper with a graceful demo-mode fallback.
+ * LLM streaming wrapper with a graceful demo-mode fallback.
  *
- * When `OPENAI_API_KEY` is set:
- *   · Real `openai` client; streams Chat Completions chunks.
- * When the key is absent (demo / dev):
- *   · Hand-crafted streaming reply that mirrors the OpenAI shape so the
- *     entire UI pipeline (streaming, markdown, syntax highlighting,
- *     AIHistory logging) is exercised end-to-end without any external
- *     service. The reply is contextual: summary, draft, ideas, code, etc.
+ * Provider auto-selection (first match wins):
+ *   · `OPENROUTER_API_KEY` set → OpenRouter (OpenAI-compatible gateway,
+ *     hundreds of models incl. several free tiers).
+ *   · `OPENAI_API_KEY` set     → OpenAI direct.
+ *   · neither set              → hand-crafted streamed mock so the entire
+ *     UI pipeline (streaming, markdown, highlight, AIHistory log) is
+ *     exercised end-to-end without any external service.
+ *
+ * Both real providers go through the `openai` SDK (it accepts any
+ * `baseURL`), so the streaming/usage code stays identical.
  */
 
 import "server-only";
@@ -23,7 +26,7 @@ export interface ChatMessageInput {
 
 export interface StreamChatOptions {
   messages: ChatMessageInput[];
-  /** Optional override; otherwise reads OPENAI_MODEL or defaults to a cheap one. */
+  /** Optional override; otherwise reads OPENROUTER_MODEL / OPENAI_MODEL. */
   model?: string;
   temperature?: number;
   maxTokens?: number;
@@ -35,12 +38,13 @@ export interface StreamChunk {
   delta: string;
 }
 
+export type LLMProvider = "openrouter" | "openai" | "demo";
+
 export interface StreamResult {
   text: string;
   tokensInput: number;
   tokensOutput: number;
-  /** Returns "openai" or "demo" depending on whether the real API was used. */
-  provider: "openai" | "demo";
+  provider: LLMProvider;
   model: string;
   latencyMs: number;
 }
@@ -58,15 +62,59 @@ Style:
 You can reference the user's workspace (projects, tasks, conversations) when
 relevant. Never invent data; if you don't have it, ask.`;
 
-export function hasOpenAIKey(): boolean {
-  return !!process.env.OPENAI_API_KEY?.trim();
+function resolveProvider(): Exclude<LLMProvider, "demo"> | null {
+  if (process.env.OPENROUTER_API_KEY?.trim()) return "openrouter";
+  if (process.env.OPENAI_API_KEY?.trim()) return "openai";
+  return null;
 }
 
+function resolveDefaultModel(provider: Exclude<LLMProvider, "demo">): string {
+  if (provider === "openrouter") {
+    return (
+      process.env.OPENROUTER_MODEL?.trim() ||
+      process.env.OPENAI_MODEL?.trim() ||
+      "meta-llama/llama-3.3-70b-instruct:free"
+    );
+  }
+  return process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
+}
+
+/** True when at least one real provider key is configured. */
+export function hasLLMKey(): boolean {
+  return resolveProvider() !== null;
+}
+
+/** Back-compat alias — old call sites can keep using this name. */
+export const hasOpenAIKey = hasLLMKey;
+
 let _client: OpenAI | null = null;
-async function getClient(): Promise<OpenAI> {
-  if (_client) return _client;
+let _clientProvider: Exclude<LLMProvider, "demo"> | null = null;
+
+async function getClient(
+  provider: Exclude<LLMProvider, "demo">
+): Promise<OpenAI> {
+  if (_client && _clientProvider === provider) return _client;
+
   const mod = await import("openai");
-  _client = new mod.default({ apiKey: process.env.OPENAI_API_KEY! });
+
+  if (provider === "openrouter") {
+    // OpenRouter is OpenAI-compatible; just swap baseURL + auth.
+    // The Referer + Title headers are OpenRouter's recommended way to
+    // surface your app in their attribution / analytics dashboards.
+    _client = new mod.default({
+      apiKey: process.env.OPENROUTER_API_KEY!,
+      baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer":
+          process.env.NEXT_PUBLIC_APP_URL || "https://nexboard-beige.vercel.app",
+        "X-Title": "NexBoard",
+      },
+    });
+  } else {
+    _client = new mod.default({ apiKey: process.env.OPENAI_API_KEY! });
+  }
+
+  _clientProvider = provider;
   return _client;
 }
 
@@ -85,13 +133,13 @@ export async function* streamChat(
     ...options.messages,
   ];
 
-  if (!hasOpenAIKey()) {
+  const provider = resolveProvider();
+  if (!provider) {
     return yield* demoStream(options, started);
   }
 
-  const client = await getClient();
-  const model =
-    options.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const client = await getClient(provider);
+  const model = options.model || resolveDefaultModel(provider);
 
   let fullText = "";
   try {
@@ -126,13 +174,13 @@ export async function* streamChat(
       text: fullText,
       tokensInput: inputTokens || estimateTokens(joinMessages(messages)),
       tokensOutput: outputTokens || estimateTokens(fullText),
-      provider: "openai",
+      provider,
       model,
       latencyMs: Date.now() - started,
     };
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("[ai/openai] stream failed, falling back to demo:", err);
+    console.error(`[ai/${provider}] stream failed, falling back to demo:`, err);
     return yield* demoStream(options, started);
   }
 }
@@ -297,11 +345,27 @@ function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-/** OpenAI list price (USD per 1M tokens) — kept here so cost is one number to swap. */
+/** USD per 1M tokens — used for the cost ledger in AIHistory. Unknown
+ *  models fall through to $0 so nothing crashes if a new model id is
+ *  introduced before this table catches up. */
 const PRICE_TABLE: Record<string, { input: number; output: number }> = {
+  // OpenAI direct
   "gpt-4o-mini": { input: 0.15, output: 0.6 },
   "gpt-4o": { input: 2.5, output: 10 },
   "gpt-4.1": { input: 3, output: 12 },
+
+  // OpenRouter — free tiers
+  "meta-llama/llama-3.3-70b-instruct:free": { input: 0, output: 0 },
+  "meta-llama/llama-3.1-8b-instruct:free": { input: 0, output: 0 },
+  "mistralai/mistral-7b-instruct:free": { input: 0, output: 0 },
+  "google/gemma-2-9b-it:free": { input: 0, output: 0 },
+  "x-ai/grok-4-fast:free": { input: 0, output: 0 },
+
+  // OpenRouter — common paid (May 2026 list prices)
+  "openai/gpt-4o-mini": { input: 0.15, output: 0.6 },
+  "anthropic/claude-3.5-haiku": { input: 0.8, output: 4 },
+  "google/gemini-2.0-flash": { input: 0.1, output: 0.4 },
+
   "nova-demo-1": { input: 0, output: 0 },
 };
 

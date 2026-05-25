@@ -7,7 +7,12 @@ import { Conversation } from "@/models/Conversation";
 import { Message } from "@/models/Message";
 import { User } from "@/models/User";
 import { requireSession, badRequest, serverError, notFound } from "@/lib/api";
-import { streamChat, estimateCostUsd, hasOpenAIKey } from "@/lib/ai/openai";
+import {
+  streamChat,
+  estimateCostUsd,
+  hasLLMKey,
+  type LLMProvider,
+} from "@/lib/ai/openai";
 import { logAIRun } from "@/lib/ai/log";
 import { rateLimit, tooMany } from "@/lib/rate-limit";
 
@@ -151,7 +156,11 @@ export async function POST(req: Request, ctx: RouteContext) {
         workspace: workspaceId,
         conversation: conv._id,
         kind: "chat",
-        provider: hasOpenAIKey() ? "openai" : "demo",
+        provider: hasLLMKey()
+          ? process.env.OPENROUTER_API_KEY
+            ? "openrouter"
+            : "openai"
+          : "demo",
         model: "unknown",
         promptPreview: parsed.content,
         status: "error",
@@ -186,7 +195,11 @@ export async function POST(req: Request, ctx: RouteContext) {
 
       let fullText = "";
       let model = "unknown";
-      let provider: "openai" | "demo" = hasOpenAIKey() ? "openai" : "demo";
+      let provider: LLMProvider = hasLLMKey()
+        ? process.env.OPENROUTER_API_KEY
+          ? "openrouter"
+          : "openai"
+        : "demo";
       let inputTokens = 0;
       let outputTokens = 0;
       let latencyMs = 0;
