@@ -58,19 +58,22 @@ const aiInsights = [
     icon: TrendingUp,
     title: "Signups up 24% week-over-week",
     desc: "Driven primarily by the new pricing page (+3,210 visits).",
-    tone: "from-violet-500/20",
+    tone: "from-indigo-500/[0.04]",
+    iconBg: "bg-indigo-50 text-indigo-600",
   },
   {
     icon: Zap,
     title: "Activation lagging in EU cohort",
     desc: "Time-to-first-doc is 1.4× higher. Consider EU-specific onboarding.",
-    tone: "from-amber-500/20",
+    tone: "from-amber-500/[0.04]",
+    iconBg: "bg-amber-50 text-amber-600",
   },
   {
     icon: Users,
     title: "Power users growing 3.2x faster",
     desc: "Teams using Nova AI 5+ times/day churn 78% less.",
-    tone: "from-cyan-500/20",
+    tone: "from-sky-500/[0.04]",
+    iconBg: "bg-sky-50 text-sky-600",
   },
 ];
 
@@ -154,13 +157,18 @@ export default function AnalyticsPage() {
             >
               <CardContent className="p-5">
                 <div className="flex items-start gap-3">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.04] text-violet-200">
+                  <div
+                    className={
+                      "grid h-10 w-10 shrink-0 place-items-center rounded-xl " +
+                      s.iconBg
+                    }
+                  >
                     <Icon className="size-4" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="size-3 text-violet-300" />
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-violet-200">
+                      <Sparkles className="size-3 text-indigo-500" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-600">
                         AI Insight
                       </span>
                     </div>

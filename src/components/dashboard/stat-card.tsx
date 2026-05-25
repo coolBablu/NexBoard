@@ -17,25 +17,30 @@ interface StatCardProps {
   formatter?: (n: number) => string;
 }
 
+// Light theme: keep the background almost neutral white — accent comes
+// only from the icon chip. This gives the "Linear / Vercel" official feel
+// instead of the candy-pastel look that strong tinted gradients produce
+// on a white background. Dark mode still gets the saturated washes
+// via `:where(.dark) &` overrides below.
 const accents = {
   violet: {
-    bg: "from-violet-500/25",
-    icon: "bg-violet-500/15 text-violet-200 border-violet-400/20",
+    bg: "from-indigo-500/[0.06]",
+    icon: "bg-indigo-50 text-indigo-600 border-indigo-100",
     glow: "violet" as const,
   },
   cyan: {
-    bg: "from-cyan-500/25",
-    icon: "bg-cyan-500/15 text-cyan-200 border-cyan-400/20",
+    bg: "from-sky-500/[0.06]",
+    icon: "bg-sky-50 text-sky-600 border-sky-100",
     glow: "cyan" as const,
   },
   fuchsia: {
-    bg: "from-fuchsia-500/25",
-    icon: "bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-400/20",
+    bg: "from-indigo-600/[0.06]",
+    icon: "bg-indigo-50 text-indigo-700 border-indigo-100",
     glow: "fuchsia" as const,
   },
   emerald: {
-    bg: "from-emerald-400/25",
-    icon: "bg-emerald-500/15 text-emerald-200 border-emerald-400/20",
+    bg: "from-emerald-500/[0.06]",
+    icon: "bg-emerald-50 text-emerald-600 border-emerald-100",
     glow: "none" as const,
   },
 };

@@ -312,10 +312,10 @@ function Kpi({
   icon: React.ElementType;
 }) {
   const tones: Record<typeof accent, string> = {
-    violet: "from-violet-500/15 to-violet-500/0 text-violet-200",
-    cyan: "from-cyan-500/15 to-cyan-500/0 text-cyan-200",
-    emerald: "from-emerald-500/15 to-emerald-500/0 text-emerald-200",
-    rose: "from-rose-500/15 to-rose-500/0 text-rose-200",
+    violet: "from-indigo-500/[0.05] to-transparent text-indigo-600",
+    cyan: "from-sky-500/[0.05] to-transparent text-sky-600",
+    emerald: "from-emerald-500/[0.05] to-transparent text-emerald-600",
+    rose: "from-rose-500/[0.05] to-transparent text-rose-600",
   };
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4 backdrop-blur-xl">
