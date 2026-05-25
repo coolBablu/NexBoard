@@ -112,21 +112,19 @@ const nextConfig = {
           { key: "X-Robots-Tag", value: "noindex" },
         ],
       },
-      // Authenticated app shell pages — never cache HTML. The HTML
-      // references fingerprinted JS chunks that change every deploy;
-      // a stale cached HTML would 404 the new chunks. Forcing a
-      // network round-trip for the HTML is cheap and avoids the
-      // "blank page after deploy" foot-gun for users.
-      {
-        source:
-          "/:path((?:dashboard|inbox|calendar|workspace|projects|team|analytics|assistant|settings).*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "private, no-cache, no-store, max-age=0, must-revalidate",
-          },
-        ],
-      },
+      // NOTE: do NOT add a custom Cache-Control on the authenticated
+      // app routes (`/dashboard`, `/inbox`, etc.). Adding `no-store` /
+      // `private` to those responses breaks Next.js App Router prefetch
+      // and client-side navigation: the RSC payload prefetch is never
+      // stored in the Router Cache, so the first click on a sidebar
+      // link silently no-ops and a hard refresh is required.
+      //
+      // Vercel + Next.js already handle stale-after-deploy correctly:
+      // the SSR HTML embeds fingerprinted asset URLs, and on deploy the
+      // old build's HTML continues to point at chunks Vercel keeps
+      // around for the immutable static window. A user opening a stale
+      // tab after a deploy may need ONE refresh; that's acceptable and
+      // far less bad than breaking every in-app navigation.
     ];
   },
 
