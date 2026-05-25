@@ -29,8 +29,8 @@ export function FunnelBars() {
         >
           <defs>
             <linearGradient id="bGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#A78BFA" stopOpacity={1} />
-              <stop offset="100%" stopColor="#22D3EE" stopOpacity={0.4} />
+              <stop offset="0%" stopColor="#818CF8" stopOpacity={1} />
+              <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0.4} />
             </linearGradient>
           </defs>
           <CartesianGrid

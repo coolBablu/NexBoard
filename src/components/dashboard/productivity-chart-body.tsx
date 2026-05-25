@@ -64,16 +64,16 @@ export default function ProductivityChartBody({ data }: { data: Datum[] }) {
       <AreaChart data={data}>
         <defs>
           <linearGradient id="prShipped" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.55} />
-            <stop offset="100%" stopColor="#8B5CF6" stopOpacity={0} />
+            <stop offset="0%" stopColor="#5E6AD2" stopOpacity={0.55} />
+            <stop offset="100%" stopColor="#5E6AD2" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="prFocus" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.45} />
-            <stop offset="100%" stopColor="#22D3EE" stopOpacity={0} />
+            <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.45} />
+            <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="prAi" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#D946EF" stopOpacity={0.4} />
-            <stop offset="100%" stopColor="#D946EF" stopOpacity={0} />
+            <stop offset="0%" stopColor="#4F46E5" stopOpacity={0.4} />
+            <stop offset="100%" stopColor="#4F46E5" stopOpacity={0} />
           </linearGradient>
         </defs>
 
@@ -101,7 +101,7 @@ export default function ProductivityChartBody({ data }: { data: Datum[] }) {
         <Area
           type="monotone"
           dataKey="ai"
-          stroke="#D946EF"
+          stroke="#4F46E5"
           strokeWidth={1.5}
           fill="url(#prAi)"
           stackId="1"
@@ -109,7 +109,7 @@ export default function ProductivityChartBody({ data }: { data: Datum[] }) {
         <Area
           type="monotone"
           dataKey="focus"
-          stroke="#22D3EE"
+          stroke="#0EA5E9"
           strokeWidth={1.5}
           fill="url(#prFocus)"
           stackId="1"
@@ -117,7 +117,7 @@ export default function ProductivityChartBody({ data }: { data: Datum[] }) {
         <Area
           type="monotone"
           dataKey="shipped"
-          stroke="#A78BFA"
+          stroke="#818CF8"
           strokeWidth={2}
           fill="url(#prShipped)"
           stackId="1"

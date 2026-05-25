@@ -22,8 +22,8 @@ export function ChartSkeleton({ height = 280 }: { height?: number }) {
       >
         <defs>
           <linearGradient id="cs-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(139,92,246,0.32)" />
-            <stop offset="100%" stopColor="rgba(139,92,246,0)" />
+            <stop offset="0%" stopColor="rgba(94, 106, 210,0.32)" />
+            <stop offset="100%" stopColor="rgba(94, 106, 210,0)" />
           </linearGradient>
         </defs>
         <path

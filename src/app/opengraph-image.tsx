@@ -27,7 +27,7 @@ export default async function OpenGraphImage() {
           justifyContent: "space-between",
           padding: "80px",
           background:
-            "radial-gradient(ellipse 80% 60% at 30% 20%, rgba(139,92,246,0.45), transparent 60%), radial-gradient(ellipse 70% 60% at 90% 90%, rgba(34,211,238,0.35), transparent 60%), radial-gradient(ellipse 60% 50% at 50% 100%, rgba(217,70,239,0.35), transparent 60%), #0b0a10",
+            "radial-gradient(ellipse 80% 60% at 30% 20%, rgba(94, 106, 210,0.45), transparent 60%), radial-gradient(ellipse 70% 60% at 90% 90%, rgba(14, 165, 233,0.35), transparent 60%), radial-gradient(ellipse 60% 50% at 50% 100%, rgba(79, 70, 229,0.35), transparent 60%), #0b0a10",
           color: "white",
           fontFamily: "Inter, sans-serif",
         }}
@@ -44,7 +44,7 @@ export default async function OpenGraphImage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 32px rgba(139,92,246,0.6)",
+              boxShadow: "0 8px 32px rgba(94, 106, 210,0.6)",
               fontSize: 28,
               fontWeight: 700,
               color: "white",

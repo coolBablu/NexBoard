@@ -31,16 +31,16 @@ export function BigAreaChart() {
         >
           <defs>
             <linearGradient id="aSessions" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.5} />
-              <stop offset="100%" stopColor="#8B5CF6" stopOpacity={0} />
+              <stop offset="0%" stopColor="#5E6AD2" stopOpacity={0.5} />
+              <stop offset="100%" stopColor="#5E6AD2" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="aSignups" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.45} />
-              <stop offset="100%" stopColor="#22D3EE" stopOpacity={0} />
+              <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.45} />
+              <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="aActiv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#D946EF" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#D946EF" stopOpacity={0} />
+              <stop offset="0%" stopColor="#4F46E5" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#4F46E5" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -60,7 +60,7 @@ export function BigAreaChart() {
             tickLine={false}
           />
           <Tooltip
-            cursor={{ stroke: "rgba(139,92,246,0.4)", strokeWidth: 1 }}
+            cursor={{ stroke: "rgba(94, 106, 210,0.4)", strokeWidth: 1 }}
             contentStyle={{
               background: "rgba(15,14,20,0.92)",
               border: "1px solid rgba(255,255,255,0.08)",
@@ -77,7 +77,7 @@ export function BigAreaChart() {
           <Area
             type="monotone"
             dataKey="sessions"
-            stroke="#A78BFA"
+            stroke="#818CF8"
             fill="url(#aSessions)"
             strokeWidth={2}
             isAnimationActive
@@ -86,7 +86,7 @@ export function BigAreaChart() {
           <Area
             type="monotone"
             dataKey="signups"
-            stroke="#67E8F9"
+            stroke="#38BDF8"
             fill="url(#aSignups)"
             strokeWidth={2}
             isAnimationActive
@@ -95,7 +95,7 @@ export function BigAreaChart() {
           <Area
             type="monotone"
             dataKey="activations"
-            stroke="#F0ABFC"
+            stroke="#A5B4FC"
             fill="url(#aActiv)"
             strokeWidth={2}
             isAnimationActive

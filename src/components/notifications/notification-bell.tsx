@@ -255,7 +255,7 @@ export function NotificationBell() {
                       )}
                     </div>
                     {unreadCard && (
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400 shadow-[0_0_6px_rgba(167,139,250,0.7)]" />
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400 shadow-[0_0_6px_rgba(129, 140, 248,0.7)]" />
                     )}
                   </motion.a>
                 );

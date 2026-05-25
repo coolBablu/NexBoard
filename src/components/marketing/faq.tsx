@@ -130,7 +130,7 @@ export function FAQ() {
                     className={cn(
                       "relative overflow-hidden rounded-2xl border bg-white/[0.02] backdrop-blur-xl transition-all",
                       isOpen
-                        ? "border-white/[0.12] shadow-[0_20px_60px_-20px_rgba(139,92,246,0.35)]"
+                        ? "border-white/[0.12] shadow-[0_20px_60px_-20px_rgba(94, 106, 210,0.35)]"
                         : "border-white/[0.07] hover:border-white/[0.12]"
                     )}
                   >
@@ -143,7 +143,7 @@ export function FAQ() {
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.4 }}
-                          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.12),transparent_70%)]"
+                          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(94, 106, 210,0.12),transparent_70%)]"
                         />
                       )}
                     </AnimatePresence>

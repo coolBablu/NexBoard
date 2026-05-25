@@ -77,7 +77,7 @@ const toneMap = {
     bg: "from-violet-500/12 to-violet-500/0",
     chip: "border-violet-500/30 bg-violet-500/12 text-violet-200",
     iconBg: "bg-violet-500/15 text-violet-200 border-violet-400/25",
-    glow: "rgba(139,92,246,0.35)",
+    glow: "rgba(94, 106, 210,0.35)",
   },
   amber: {
     bg: "from-amber-500/12 to-amber-500/0",
@@ -95,7 +95,7 @@ const toneMap = {
     bg: "from-cyan-500/12 to-cyan-500/0",
     chip: "border-cyan-500/30 bg-cyan-500/12 text-cyan-200",
     iconBg: "bg-cyan-500/15 text-cyan-200 border-cyan-400/25",
-    glow: "rgba(34,211,238,0.3)",
+    glow: "rgba(14, 165, 233,0.3)",
   },
 } as const;
 

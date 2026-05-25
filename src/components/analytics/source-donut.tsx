@@ -9,9 +9,9 @@ import {
 } from "recharts";
 
 const data = [
-  { name: "Organic", value: 38, color: "#8B5CF6" },
-  { name: "Referral", value: 24, color: "#22D3EE" },
-  { name: "Social", value: 18, color: "#D946EF" },
+  { name: "Organic", value: 38, color: "#5E6AD2" },
+  { name: "Referral", value: 24, color: "#0EA5E9" },
+  { name: "Social", value: 18, color: "#4F46E5" },
   { name: "Direct", value: 12, color: "#34D399" },
   { name: "Paid", value: 8, color: "#F59E0B" },
 ];

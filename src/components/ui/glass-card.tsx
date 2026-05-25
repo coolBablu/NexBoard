@@ -16,10 +16,10 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
   ) => {
     const glowMap = {
       violet:
-        "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top_left,rgba(139,92,246,0.25),transparent_60%)]",
-      cyan: "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top_right,rgba(34,211,238,0.22),transparent_60%)]",
+        "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top_left,rgba(94, 106, 210,0.25),transparent_60%)]",
+      cyan: "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_top_right,rgba(14, 165, 233,0.22),transparent_60%)]",
       fuchsia:
-        "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_bottom_right,rgba(217,70,239,0.22),transparent_60%)]",
+        "before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-[radial-gradient(ellipse_at_bottom_right,rgba(79, 70, 229,0.22),transparent_60%)]",
       none: "",
     } as const;
 

@@ -152,7 +152,7 @@ export function FloatingAssistant() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.95 }}
         className={cn(
-          "fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-2xl bg-nova-gradient text-white shadow-[0_18px_40px_-12px_rgba(139,92,246,0.7)] sm:bottom-6 sm:right-6",
+          "fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-2xl bg-nova-gradient text-white shadow-[0_18px_40px_-12px_rgba(94, 106, 210,0.7)] sm:bottom-6 sm:right-6",
           open && "pointer-events-none opacity-0"
         )}
         aria-label="Open Nova assistant"

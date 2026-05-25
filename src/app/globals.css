@@ -2,36 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ────────────────────────────────────────────────────────────────────
+ * NexBoard — Linear Light theme
+ *
+ * Light mode is the default. The original midnight palette is preserved
+ * under `.dark` so a runtime toggle can be added without touching any
+ * component code.
+ *
+ * Brand accent: Linear-style cool indigo (#5E6AD2).
+ * Secondary accent: sky blue (#0EA5E9) reserved for AI / data viz.
+ * ────────────────────────────────────────────────────────────────────*/
+
 @layer base {
   :root {
-    /* Dark by default — premium midnight palette */
-    --background: 240 14% 5%;
-    --foreground: 210 20% 98%;
+    /* Soft off-white background — easier on projector eyes than #FFF */
+    --background: 240 20% 99%;
+    --foreground: 240 10% 12%;
 
-    --card: 240 12% 7%;
-    --card-foreground: 210 20% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 12%;
 
-    --popover: 240 14% 6%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 12%;
 
-    --primary: 263 86% 66%;
+    /* Linear-style cool indigo */
+    --primary: 232 56% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 6% 12%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 240 10% 96%;
+    --secondary-foreground: 240 10% 18%;
 
-    --muted: 240 6% 12%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 240 10% 96%;
+    --muted-foreground: 240 5% 42%;
 
-    --accent: 188 86% 53%;
-    --accent-foreground: 240 10% 4%;
+    /* Sky blue — used sparingly for AI / informational accents */
+    --accent: 199 90% 48%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 8% 16%;
-    --input: 240 8% 14%;
-    --ring: 263 86% 66%;
+    --border: 240 10% 90%;
+    --input: 240 10% 92%;
+    --ring: 232 56% 60%;
 
     --radius: 0.85rem;
 
@@ -42,11 +55,37 @@
       monospace;
   }
 
-  /* Force dark scheme — premium product feel */
+  /* Dark mode — preserved for future toggle. Original midnight palette. */
+  .dark {
+    --background: 240 14% 5%;
+    --foreground: 210 20% 98%;
+    --card: 240 12% 7%;
+    --card-foreground: 210 20% 98%;
+    --popover: 240 14% 6%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263 86% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 188 86% 53%;
+    --accent-foreground: 240 10% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 8% 16%;
+    --input: 240 8% 14%;
+    --ring: 263 86% 66%;
+  }
+
   html {
-    color-scheme: dark;
+    color-scheme: light;
     scroll-behavior: smooth;
-    scroll-padding-top: 96px; /* offset for sticky navbar */
+    scroll-padding-top: 96px;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   /* Lenis-managed smooth scroll on the marketing site */
@@ -75,8 +114,31 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Light-mode body: soft indigo/sky tinted gradients */
   body {
     background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 50% -20%,
+        rgba(94, 106, 210, 0.08),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 60% 50% at 100% 0%,
+        rgba(14, 165, 233, 0.06),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 50% 40% at 0% 100%,
+        rgba(94, 106, 210, 0.04),
+        transparent
+      );
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Dark-mode body: original midnight gradients */
+  .dark body {
     background-image:
       radial-gradient(
         ellipse 80% 50% at 50% -20%,
@@ -93,16 +155,14 @@
         rgba(217, 70, 239, 0.08),
         transparent
       );
-    background-attachment: fixed;
-    min-height: 100vh;
   }
 
   ::selection {
-    background: hsl(var(--primary) / 0.35);
+    background: hsl(var(--primary) / 0.2);
     color: hsl(var(--foreground));
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar — adapts to theme via vars */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -132,41 +192,162 @@
   }
 }
 
+/* ────────────────────────────────────────────────────────────────────
+ * LIGHT-MODE UTILITY OVERRIDES
+ *
+ * The dark theme used `bg-white/[0.0X]` and `border-white/[0.0X]` as
+ * elevation tokens (a translucent white over a black surface). On a
+ * light background, those become invisible. Re-map them here to crisp
+ * solid surfaces and slate borders. Components don't need to change.
+ * These rules are scoped to `:not(.dark) ...` so the dark toggle
+ * (which adds .dark on <html>) still gets the original look.
+ * ────────────────────────────────────────────────────────────────────*/
+
+@layer utilities {
+  /* Surface fills — translucent white → solid white / slate tones */
+  html:not(.dark) .bg-white\/\[0\.02\] {
+    background-color: rgb(255, 255, 255);
+  }
+  html:not(.dark) .bg-white\/\[0\.03\] {
+    background-color: rgb(252, 252, 253);
+  }
+  html:not(.dark) .bg-white\/\[0\.04\] {
+    background-color: rgb(250, 250, 252);
+  }
+  html:not(.dark) .bg-white\/\[0\.05\] {
+    background-color: rgb(248, 250, 252);
+  }
+  html:not(.dark) .bg-white\/\[0\.06\] {
+    background-color: rgb(245, 247, 250);
+  }
+  html:not(.dark) .bg-white\/\[0\.07\] {
+    background-color: rgb(244, 246, 249);
+  }
+  html:not(.dark) .bg-white\/\[0\.08\] {
+    background-color: rgb(241, 245, 249);
+  }
+  html:not(.dark) .bg-white\/\[0\.1\] {
+    background-color: rgb(238, 242, 247);
+  }
+  html:not(.dark) .bg-white\/\[0\.12\] {
+    background-color: rgb(234, 239, 245);
+  }
+  html:not(.dark) .bg-white\/\[0\.15\] {
+    background-color: rgb(229, 235, 242);
+  }
+
+  /* Hover variants */
+  html:not(.dark) .hover\:bg-white\/\[0\.03\]:hover {
+    background-color: rgb(248, 250, 252);
+  }
+  html:not(.dark) .hover\:bg-white\/\[0\.04\]:hover {
+    background-color: rgb(245, 247, 250);
+  }
+  html:not(.dark) .hover\:bg-white\/\[0\.05\]:hover {
+    background-color: rgb(241, 245, 249);
+  }
+  html:not(.dark) .hover\:bg-white\/\[0\.06\]:hover {
+    background-color: rgb(238, 242, 247);
+  }
+  html:not(.dark) .hover\:bg-white\/\[0\.08\]:hover {
+    background-color: rgb(234, 239, 245);
+  }
+  html:not(.dark) .hover\:bg-white\/\[0\.1\]:hover {
+    background-color: rgb(229, 235, 242);
+  }
+
+  /* Borders — translucent white → slate tones */
+  html:not(.dark) .border-white\/\[0\.04\] {
+    border-color: rgb(241, 245, 249);
+  }
+  html:not(.dark) .border-white\/\[0\.05\] {
+    border-color: rgb(236, 240, 247);
+  }
+  html:not(.dark) .border-white\/\[0\.06\] {
+    border-color: rgb(232, 236, 244);
+  }
+  html:not(.dark) .border-white\/\[0\.07\] {
+    border-color: rgb(228, 232, 240);
+  }
+  html:not(.dark) .border-white\/\[0\.08\] {
+    border-color: rgb(226, 232, 240);
+  }
+  html:not(.dark) .border-white\/\[0\.1\] {
+    border-color: rgb(220, 226, 235);
+  }
+  html:not(.dark) .border-white\/\[0\.12\] {
+    border-color: rgb(214, 220, 230);
+  }
+  html:not(.dark) .border-white\/\[0\.15\] {
+    border-color: rgb(208, 215, 226);
+  }
+  html:not(.dark) .border-white\/15 {
+    border-color: rgb(208, 215, 226);
+  }
+  html:not(.dark) .border-white\/10 {
+    border-color: rgb(220, 226, 235);
+  }
+
+  /* Hover border variants */
+  html:not(.dark) .hover\:border-white\/\[0\.1\]:hover {
+    border-color: rgb(208, 215, 226);
+  }
+  html:not(.dark) .hover\:border-white\/\[0\.12\]:hover {
+    border-color: rgb(199, 207, 220);
+  }
+  html:not(.dark) .hover\:border-white\/\[0\.15\]:hover {
+    border-color: rgb(192, 200, 215);
+  }
+
+  /* Ring shadows that were tuned for dark mode */
+  html:not(.dark) .ring-background {
+    --tw-ring-color: hsl(var(--background));
+  }
+}
+
 @layer components {
-  /* Glassmorphism surface */
+  /* Glassmorphism surface — light-friendly */
   .glass {
-    @apply relative bg-white/[0.03] backdrop-blur-xl border border-white/[0.08];
+    @apply relative bg-white backdrop-blur-xl border border-slate-200/80;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
+      0 8px 32px -12px rgba(15, 23, 42, 0.08);
+  }
+  .dark .glass {
+    @apply bg-white/[0.03] border-white/[0.08];
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
       0 12px 40px -12px rgba(0, 0, 0, 0.6);
   }
 
   .glass-strong {
-    @apply relative bg-white/[0.05] backdrop-blur-2xl border border-white/[0.1];
+    @apply relative bg-white backdrop-blur-2xl border border-slate-200;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
+      0 16px 48px -16px rgba(15, 23, 42, 0.12);
+  }
+  .dark .glass-strong {
+    @apply bg-white/[0.05] border-white/[0.1];
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
       0 20px 60px -16px rgba(0, 0, 0, 0.7);
   }
 
-  /* Gradient text */
+  /* Gradient text — light mode uses brand indigo → sky */
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #a78bfa 50%,
-      #22d3ee 100%
-    );
+    background-image: linear-gradient(135deg, #1a1a2e 0%, #5e6ad2 60%, #0ea5e9 100%);
+  }
+  .dark .text-gradient {
+    background-image: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #22d3ee 100%);
   }
 
   .text-gradient-nova {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      135deg,
-      #8b5cf6 0%,
-      #d946ef 50%,
-      #22d3ee 100%
-    );
+    background-image: linear-gradient(135deg, #5e6ad2 0%, #4f46e5 50%, #0ea5e9 100%);
+  }
+  .dark .text-gradient-nova {
+    background-image: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #22d3ee 100%);
   }
 
   /* Glowing border via gradient mask */
@@ -182,9 +363,9 @@
     border-radius: inherit;
     background: linear-gradient(
       135deg,
-      rgba(139, 92, 246, 0.6),
-      rgba(34, 211, 238, 0.4),
-      rgba(217, 70, 239, 0.5)
+      rgba(94, 106, 210, 0.5),
+      rgba(14, 165, 233, 0.35),
+      rgba(79, 70, 229, 0.4)
     );
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -193,12 +374,20 @@
     mask-composite: exclude;
     pointer-events: none;
   }
+  .dark .border-gradient::before {
+    background: linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.6),
+      rgba(34, 211, 238, 0.4),
+      rgba(217, 70, 239, 0.5)
+    );
+  }
 
-  /* Animated grid background */
+  /* Animated grid background — subtle slate on light */
   .bg-grid {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
     background-size: 56px 56px;
     background-position: -1px -1px;
     mask-image: radial-gradient(
@@ -207,9 +396,21 @@
       transparent 80%
     );
   }
+  .dark .bg-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  }
 
   /* Spotlight cursor effect */
   .spotlight {
+    background: radial-gradient(
+      600px circle at var(--x, 50%) var(--y, 50%),
+      rgba(94, 106, 210, 0.08),
+      transparent 40%
+    );
+  }
+  .dark .spotlight {
     background: radial-gradient(
       600px circle at var(--x, 50%) var(--y, 50%),
       rgba(139, 92, 246, 0.12),
@@ -217,8 +418,18 @@
     );
   }
 
-  /* Shimmer for skeletons / CTA */
+  /* Shimmer for skeletons — slate tones in light */
   .shimmer {
+    background: linear-gradient(
+      110deg,
+      rgba(15, 23, 42, 0.04) 8%,
+      rgba(15, 23, 42, 0.08) 18%,
+      rgba(15, 23, 42, 0.04) 33%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.5s linear infinite;
+  }
+  .dark .shimmer {
     background: linear-gradient(
       110deg,
       rgba(255, 255, 255, 0.04) 8%,
@@ -226,11 +437,29 @@
       rgba(255, 255, 255, 0.04) 33%
     );
     background-size: 200% 100%;
-    animation: shimmer 2.5s linear infinite;
   }
 
-  /* Aurora background blob */
+  /* Aurora background blob — softer indigo/sky on light */
   .aurora {
+    background-image:
+      radial-gradient(
+        ellipse at 20% 30%,
+        rgba(94, 106, 210, 0.18) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 80% 20%,
+        rgba(14, 165, 233, 0.15) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 50% 80%,
+        rgba(79, 70, 229, 0.14) 0%,
+        transparent 50%
+      );
+    filter: blur(60px);
+  }
+  .dark .aurora {
     background-image:
       radial-gradient(
         ellipse at 20% 30%,
@@ -247,11 +476,21 @@
         rgba(217, 70, 239, 0.28) 0%,
         transparent 50%
       );
-    filter: blur(60px);
   }
 
-  /* Nav pill active */
+  /* Sidebar active nav pill */
   .nav-active {
+    background: linear-gradient(
+      135deg,
+      rgba(94, 106, 210, 0.12),
+      rgba(14, 165, 233, 0.08)
+    );
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
+      0 0 0 1px rgba(94, 106, 210, 0.18),
+      0 2px 8px -4px rgba(94, 106, 210, 0.25);
+  }
+  .dark .nav-active {
     background: linear-gradient(
       135deg,
       rgba(139, 92, 246, 0.18),
@@ -267,15 +506,18 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
-  /* Skip-to-content link — visible only when keyboard-focused. */
+  /* Skip-to-content link */
   .skip-link {
-    @apply sr-only absolute left-3 top-3 z-[100] rounded-lg border border-white/15 bg-background/95 px-3 py-1.5 text-xs font-medium text-foreground shadow-2xl backdrop-blur;
+    @apply sr-only absolute left-3 top-3 z-[100] rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-foreground shadow-2xl;
     @apply focus-visible:not-sr-only focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60;
+  }
+  .dark .skip-link {
+    @apply border-white/15 bg-background/95 backdrop-blur;
   }
 }
 
 /* ────────────────────────────────────────────────────────────────────
- * Keyframes used by Skeleton primitives + brand loaders.
+ * Keyframes
  * ────────────────────────────────────────────────────────────────────*/
 @keyframes shimmer {
   0% {
@@ -307,8 +549,6 @@
   }
 }
 
-/* Honor users who request reduced motion. Keeps essential opacity fades
- * (so context isn't lost) but kills movement / parallax / shimmers. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -365,7 +605,10 @@
 
   /* Subtle noise texture — adds analog warmth to flat surfaces */
   .noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 200px 200px;
+  }
+  .dark .noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }

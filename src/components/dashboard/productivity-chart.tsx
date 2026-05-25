@@ -99,9 +99,9 @@ export function ProductivityChart() {
 
 function Legend() {
   const items = [
-    { c: "#A78BFA", l: "Shipped" },
-    { c: "#22D3EE", l: "Focus" },
-    { c: "#D946EF", l: "AI assist" },
+    { c: "#818CF8", l: "Shipped" },
+    { c: "#0EA5E9", l: "Focus" },
+    { c: "#4F46E5", l: "AI assist" },
   ];
   return (
     <div className="hidden items-center gap-3 sm:flex">

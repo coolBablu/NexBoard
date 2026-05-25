@@ -198,7 +198,7 @@ export function CalendarWidget() {
                   ? "text-foreground/80 hover:bg-white/[0.04]"
                   : "text-muted-foreground/30",
                 isToday &&
-                  "border border-violet-500/40 bg-gradient-to-br from-violet-500/15 to-cyan-500/10 text-foreground shadow-[0_0_24px_-8px_rgba(139,92,246,0.6)]"
+                  "border border-violet-500/40 bg-gradient-to-br from-violet-500/15 to-cyan-500/10 text-foreground shadow-[0_0_24px_-8px_rgba(94, 106, 210,0.6)]"
               )}
             >
               <div className="text-[11px] font-medium leading-none pt-0.5 font-mono">

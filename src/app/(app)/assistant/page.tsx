@@ -263,7 +263,7 @@ export default function AssistantPage() {
         </aside>
 
         <section className="relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.18),transparent)]" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-[radial-gradient(ellipse_at_top,rgba(94, 106, 210,0.18),transparent)]" />
 
           <header className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
             <div className="flex items-center gap-3">

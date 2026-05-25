@@ -54,7 +54,7 @@ export function RetentionLine() {
           <Line
             type="monotone"
             dataKey="cohortA"
-            stroke="#A78BFA"
+            stroke="#818CF8"
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 5 }}
@@ -64,7 +64,7 @@ export function RetentionLine() {
           <Line
             type="monotone"
             dataKey="cohortB"
-            stroke="#67E8F9"
+            stroke="#38BDF8"
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 5 }}
@@ -74,7 +74,7 @@ export function RetentionLine() {
           <Line
             type="monotone"
             dataKey="cohortC"
-            stroke="#F0ABFC"
+            stroke="#A5B4FC"
             strokeWidth={2.5}
             dot={false}
             activeDot={{ r: 5 }}

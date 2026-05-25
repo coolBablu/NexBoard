@@ -51,13 +51,22 @@ const config: Config = {
           foreground: "hsl(var(--popover-foreground))",
         },
         nova: {
-          violet: "#8B5CF6",
-          fuchsia: "#D946EF",
-          cyan: "#22D3EE",
-          blue: "#3B82F6",
-          mint: "#34D399",
+          // Linear-style indigo — primary brand accent.
+          indigo: "#5E6AD2",
+          indigoDark: "#4F46E5",
+          // Sky — secondary accent reserved for AI / informational.
+          sky: "#0EA5E9",
+          // Emerald / amber / rose round out chart palettes.
+          emerald: "#10B981",
           amber: "#F59E0B",
-          rose: "#FB7185",
+          rose: "#F43F5E",
+          // Legacy aliases (kept so existing components still resolve;
+          // they now point at the new Linear Light palette).
+          violet: "#5E6AD2",
+          fuchsia: "#4F46E5",
+          cyan: "#0EA5E9",
+          blue: "#0EA5E9",
+          mint: "#10B981",
         },
       },
       borderRadius: {
@@ -72,19 +81,20 @@ const config: Config = {
       },
       backgroundImage: {
         "grid-glow":
-          "radial-gradient(circle at 50% 0%, rgba(139,92,246,0.18), transparent 60%), radial-gradient(circle at 100% 100%, rgba(34,211,238,0.12), transparent 50%)",
+          "radial-gradient(circle at 50% 0%, rgba(94,106,210,0.10), transparent 60%), radial-gradient(circle at 100% 100%, rgba(14,165,233,0.08), transparent 50%)",
+        // Brand gradient (indigo → indigo-dark → sky) — readable on light bg.
         "nova-gradient":
-          "linear-gradient(135deg, #8B5CF6 0%, #D946EF 50%, #22D3EE 100%)",
+          "linear-gradient(135deg, #5E6AD2 0%, #4F46E5 50%, #0EA5E9 100%)",
         "nova-gradient-soft":
-          "linear-gradient(135deg, rgba(139,92,246,0.35), rgba(217,70,239,0.25), rgba(34,211,238,0.25))",
+          "linear-gradient(135deg, rgba(94,106,210,0.22), rgba(79,70,229,0.18), rgba(14,165,233,0.18))",
         "noise":
-          "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")",
+          "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")",
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(139,92,246,0.55)",
-        "glow-cyan": "0 0 50px -10px rgba(34,211,238,0.5)",
-        "glow-fuchsia": "0 0 50px -10px rgba(217,70,239,0.5)",
-        "inner-glow": "inset 0 1px 0 0 rgba(255,255,255,0.06)",
+        glow: "0 8px 32px -10px rgba(94,106,210,0.35)",
+        "glow-cyan": "0 8px 32px -10px rgba(14,165,233,0.30)",
+        "glow-fuchsia": "0 8px 32px -10px rgba(79,70,229,0.30)",
+        "inner-glow": "inset 0 1px 0 0 rgba(255,255,255,0.7)",
       },
       keyframes: {
         "accordion-down": {

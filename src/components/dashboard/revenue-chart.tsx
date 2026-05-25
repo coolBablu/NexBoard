@@ -56,12 +56,12 @@ export function RevenueChart() {
           >
             <defs>
               <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.55} />
-                <stop offset="100%" stopColor="#8B5CF6" stopOpacity={0} />
+                <stop offset="0%" stopColor="#5E6AD2" stopOpacity={0.55} />
+                <stop offset="100%" stopColor="#5E6AD2" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="fc" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.45} />
-                <stop offset="100%" stopColor="#22D3EE" stopOpacity={0} />
+                <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.45} />
+                <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid
@@ -82,7 +82,7 @@ export function RevenueChart() {
               tickFormatter={(v) => `$${v}k`}
             />
             <Tooltip
-              cursor={{ stroke: "rgba(139,92,246,0.4)", strokeWidth: 1 }}
+              cursor={{ stroke: "rgba(94, 106, 210,0.4)", strokeWidth: 1 }}
               contentStyle={{
                 background: "rgba(15,14,20,0.9)",
                 border: "1px solid rgba(255,255,255,0.08)",
@@ -95,7 +95,7 @@ export function RevenueChart() {
             <Area
               type="monotone"
               dataKey="revenue"
-              stroke="#A78BFA"
+              stroke="#818CF8"
               strokeWidth={2.2}
               fill="url(#rev)"
               dot={false}
@@ -105,7 +105,7 @@ export function RevenueChart() {
             <Area
               type="monotone"
               dataKey="forecast"
-              stroke="#22D3EE"
+              stroke="#0EA5E9"
               strokeWidth={2}
               strokeDasharray="4 4"
               fill="url(#fc)"

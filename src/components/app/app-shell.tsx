@@ -92,7 +92,7 @@ export function AppShell({ children, title, description }: AppShellProps) {
           >
             <div
               aria-hidden
-              className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[60vh] bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(139,92,246,0.12),transparent)]"
+              className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[60vh] bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(94, 106, 210,0.12),transparent)]"
             />
             {children}
           </main>

@@ -216,7 +216,7 @@ function NovaChatPreview() {
   ];
   return (
     <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-background/40">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.18),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(94, 106, 210,0.18),transparent_60%)]" />
       <div className="relative space-y-2 p-4">
         {messages.map((m, i) => (
           <motion.div

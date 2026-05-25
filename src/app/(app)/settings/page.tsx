@@ -219,7 +219,7 @@ function PreferencesSection() {
                     className={
                       "flex flex-col items-center gap-2 rounded-xl border p-4 text-sm transition-all " +
                       (active
-                        ? "border-primary/50 bg-primary/[0.08] text-foreground shadow-[0_0_30px_-10px_rgba(139,92,246,0.55)]"
+                        ? "border-primary/50 bg-primary/[0.08] text-foreground shadow-[0_0_30px_-10px_rgba(94, 106, 210,0.55)]"
                         : "border-white/[0.08] bg-white/[0.02] text-muted-foreground hover:border-white/15 hover:text-foreground")
                     }
                   >

@@ -33,12 +33,14 @@ interface MetricTileProps {
   unit?: string;
 }
 
+// `glow` is the RGB triplet used in radial gradients (no `rgb()` wrapper).
+// Linear Light palette: indigo / sky / indigo-deep / emerald / amber.
 const accentMap = {
-  violet: { stroke: "#A78BFA", glow: "139, 92, 246" },
-  cyan: { stroke: "#22D3EE", glow: "34, 211, 238" },
-  fuchsia: { stroke: "#E879F9", glow: "217, 70, 239" },
-  emerald: { stroke: "#34D399", glow: "52, 211, 153" },
-  amber: { stroke: "#FBBF24", glow: "251, 191, 36" },
+  violet: { stroke: "#5E6AD2", glow: "94, 106, 210" },
+  cyan: { stroke: "#0EA5E9", glow: "14, 165, 233" },
+  fuchsia: { stroke: "#4F46E5", glow: "79, 70, 229" },
+  emerald: { stroke: "#10B981", glow: "16, 185, 129" },
+  amber: { stroke: "#F59E0B", glow: "245, 158, 11" },
 } as const;
 
 /**

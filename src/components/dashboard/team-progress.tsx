@@ -44,9 +44,9 @@ export function TeamProgress() {
             >
               <defs>
                 <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" />
-                  <stop offset="50%" stopColor="#D946EF" />
-                  <stop offset="100%" stopColor="#22D3EE" />
+                  <stop offset="0%" stopColor="#5E6AD2" />
+                  <stop offset="50%" stopColor="#4F46E5" />
+                  <stop offset="100%" stopColor="#0EA5E9" />
                 </linearGradient>
               </defs>
               <PolarAngleAxis
