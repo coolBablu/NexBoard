@@ -17,6 +17,10 @@ export const authConfig: NextAuthConfig = {
       const isOnApp =
         nextUrl.pathname.startsWith("/dashboard") ||
         nextUrl.pathname.startsWith("/workspace") ||
+        nextUrl.pathname.startsWith("/projects") ||
+        nextUrl.pathname.startsWith("/team") ||
+        nextUrl.pathname.startsWith("/inbox") ||
+        nextUrl.pathname.startsWith("/calendar") ||
         nextUrl.pathname.startsWith("/analytics") ||
         nextUrl.pathname.startsWith("/assistant") ||
         nextUrl.pathname.startsWith("/settings");
