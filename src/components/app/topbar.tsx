@@ -116,15 +116,23 @@ export function Topbar({
               <AvatarImage src={userImage} alt={userName} />
               <AvatarFallback>{initials(userName)}</AvatarFallback>
             </Avatar>
-            <span className="hidden text-sm font-medium md:inline">
+            <span
+              suppressHydrationWarning
+              className="hidden text-sm font-medium md:inline"
+            >
               {userName.split(" ")[0]}
             </span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           <DropdownMenuLabel>
-            <div className="font-medium">{userName}</div>
-            <div className="text-xs font-normal text-muted-foreground">
+            <div suppressHydrationWarning className="font-medium">
+              {userName}
+            </div>
+            <div
+              suppressHydrationWarning
+              className="text-xs font-normal text-muted-foreground"
+            >
               {userEmail}
             </div>
           </DropdownMenuLabel>

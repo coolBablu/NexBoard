@@ -19,6 +19,7 @@ export function GreetingHero({ onOpenPalette }: { onOpenPalette?: () => void }) 
   const { data: session } = useSession();
   const firstName = session?.user?.name?.split(" ")[0] ?? "there";
   const greeting = useGreeting();
+  const todayLabel = useTodayLabel();
 
   return (
     <section className="relative">
@@ -32,12 +33,11 @@ export function GreetingHero({ onOpenPalette }: { onOpenPalette?: () => void }) 
               </span>
               All systems · Production
             </span>
-            <span className="hidden font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:inline">
-              {new Date().toLocaleDateString(undefined, {
-                weekday: "long",
-                month: "short",
-                day: "numeric",
-              })}
+            <span
+              suppressHydrationWarning
+              className="hidden font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:inline"
+            >
+              {todayLabel}
             </span>
           </div>
 
@@ -158,4 +158,24 @@ function useGreeting() {
     setG(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
   }, []);
   return g;
+}
+
+/**
+ * Render the user-visible date string only after mount. Server renders
+ * an empty string; client fills it in. Prevents the React #418 text
+ * hydration mismatch when the server timezone / locale differs from
+ * the browser's.
+ */
+function useTodayLabel() {
+  const [label, setLabel] = React.useState("");
+  React.useEffect(() => {
+    setLabel(
+      new Date().toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "short",
+        day: "numeric",
+      })
+    );
+  }, []);
+  return label;
 }

@@ -165,8 +165,13 @@ export function Sidebar({
           {!collapsed && (
             <>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{userName}</p>
-                <p className="truncate text-xs text-muted-foreground">
+                <p suppressHydrationWarning className="truncate text-sm font-medium">
+                  {userName}
+                </p>
+                <p
+                  suppressHydrationWarning
+                  className="truncate text-xs text-muted-foreground"
+                >
                   {userEmail}
                 </p>
               </div>

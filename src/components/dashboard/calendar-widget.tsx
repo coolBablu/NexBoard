@@ -39,10 +39,25 @@ const TONE_LEFT: Record<EventTone, string> = {
 };
 
 export function CalendarWidget() {
-  const today = new Date();
-  const [cursor, setCursor] = React.useState(
-    new Date(today.getFullYear(), today.getMonth(), 1)
+  // Defer Date() to after mount — server-side "today" is in UTC while
+  // the browser is in the user's timezone, which causes a React #418
+  // hydration mismatch on the highlighted day + month label + event list.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+
+  const today = React.useMemo(
+    () => (mounted ? new Date() : new Date(2026, 4, 1)),
+    [mounted]
   );
+  const [cursor, setCursor] = React.useState(
+    () => new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+  React.useEffect(() => {
+    if (mounted) {
+      setCursor(new Date(today.getFullYear(), today.getMonth(), 1));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
 
   const todayDay = today.getDate();
   const sameMonth =
