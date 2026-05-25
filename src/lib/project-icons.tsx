@@ -9,7 +9,7 @@ import {
   Folder,
   type LucideIcon,
 } from "lucide-react";
-import type { ProjectIcon } from "@/models/Project";
+import type { ProjectIcon } from "@/lib/schemas/project";
 
 export const projectIconMap: Record<ProjectIcon, LucideIcon> = {
   "credit-card": CreditCard,

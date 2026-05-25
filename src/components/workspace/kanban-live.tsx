@@ -15,7 +15,7 @@ import {
   TASK_COLUMNS,
   type TaskColumn,
   type TaskPriority,
-} from "@/models/Task";
+} from "@/lib/schemas/task";
 
 interface TaskDTO {
   id: string;

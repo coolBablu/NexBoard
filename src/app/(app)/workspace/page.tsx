@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import { toast } from "@/lib/toast";
-import type { ProjectIcon, ProjectStatus } from "@/models/Project";
+import type { ProjectIcon, ProjectStatus } from "@/lib/schemas/project";
 
 interface ProjectDTO {
   id: string;

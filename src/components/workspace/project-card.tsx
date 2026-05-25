@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { projectIconMap } from "@/lib/project-icons";
-import type { ProjectIcon, ProjectStatus } from "@/models/Project";
+import type { ProjectIcon, ProjectStatus } from "@/lib/schemas/project";
 
 interface ProjectCardProps {
   name: string;

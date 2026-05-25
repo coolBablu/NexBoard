@@ -1,10 +1,15 @@
 import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
-export const TASK_COLUMNS = ["backlog", "progress", "review", "done"] as const;
-export type TaskColumn = (typeof TASK_COLUMNS)[number];
-
-export const TASK_PRIORITIES = ["low", "med", "high"] as const;
-export type TaskPriority = (typeof TASK_PRIORITIES)[number];
+// Constants live in @/lib/schemas/task so client components can import
+// them without pulling Mongoose into the browser bundle. Re-export here
+// so existing server code that imports from @/models/Task keeps working.
+export {
+  TASK_COLUMNS,
+  TASK_PRIORITIES,
+  type TaskColumn,
+  type TaskPriority,
+} from "@/lib/schemas/task";
+import { TASK_COLUMNS, TASK_PRIORITIES } from "@/lib/schemas/task";
 
 const TaskTagSchema = new Schema(
   {

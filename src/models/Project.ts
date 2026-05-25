@@ -1,24 +1,15 @@
 import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
 
-export const PROJECT_STATUSES = [
-  "Active",
-  "Planning",
-  "Shipped",
-  "At risk",
-] as const;
-export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
-
-export const PROJECT_ICONS = [
-  "rocket",
-  "credit-card",
-  "cpu",
-  "palette",
-  "line-chart",
-  "shield",
-  "sparkles",
-  "folder",
-] as const;
-export type ProjectIcon = (typeof PROJECT_ICONS)[number];
+// Constants live in @/lib/schemas/project so client components can import
+// them without pulling Mongoose into the browser bundle. Re-export here
+// so existing server code that imports from @/models/Project keeps working.
+export {
+  PROJECT_STATUSES,
+  PROJECT_ICONS,
+  type ProjectStatus,
+  type ProjectIcon,
+} from "@/lib/schemas/project";
+import { PROJECT_STATUSES, PROJECT_ICONS } from "@/lib/schemas/project";
 
 const ProjectSchema = new Schema(
   {

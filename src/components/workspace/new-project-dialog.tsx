@@ -13,7 +13,7 @@ import {
   projectIconOptions,
   projectColorOptions,
 } from "@/lib/project-icons";
-import { PROJECT_STATUSES, type ProjectIcon } from "@/models/Project";
+import { PROJECT_STATUSES, type ProjectIcon } from "@/lib/schemas/project";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 

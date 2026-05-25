@@ -34,7 +34,7 @@ import {
 import { SkeletonChat } from "@/components/ui/skeleton";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
-import type { TaskColumn, TaskPriority } from "@/models/Task";
+import type { TaskColumn, TaskPriority } from "@/lib/schemas/task";
 
 interface TaskDTO {
   id: string;
