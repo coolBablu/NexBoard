@@ -43,11 +43,11 @@ const TONE_DOT: Record<EventTone, string> = {
 };
 
 const TONE_BG: Record<EventTone, string> = {
-  violet: "bg-violet-500/15 border-violet-500/30 text-violet-100",
-  cyan: "bg-cyan-500/15 border-cyan-500/30 text-cyan-100",
-  fuchsia: "bg-fuchsia-500/15 border-fuchsia-500/30 text-fuchsia-100",
-  emerald: "bg-emerald-500/15 border-emerald-500/30 text-emerald-100",
-  amber: "bg-amber-500/15 border-amber-500/30 text-amber-100",
+  violet: "bg-violet-500/10 border-violet-500/25 text-violet-900 dark:text-violet-100",
+  cyan: "bg-sky-500/10 border-sky-500/25 text-sky-900 dark:text-sky-100",
+  fuchsia: "bg-fuchsia-500/10 border-fuchsia-500/25 text-fuchsia-900 dark:text-fuchsia-100",
+  emerald: "bg-emerald-500/10 border-emerald-500/25 text-emerald-900 dark:text-emerald-100",
+  amber: "bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-100",
 };
 
 const TYPE_ICON: Record<EventType, React.ElementType> = {
@@ -375,7 +375,7 @@ export default function CalendarPage() {
                               )}
                             </p>
                           </div>
-                          <div className="grid size-7 shrink-0 place-items-center rounded-md bg-white/[0.06]">
+                          <div className="grid size-7 shrink-0 place-items-center rounded-md bg-black/[0.06] dark:bg-white/[0.06]">
                             <Icon className="size-3" />
                           </div>
                         </div>

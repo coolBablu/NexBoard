@@ -611,4 +611,106 @@
   .dark .noise {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * Light-theme contrast overrides
+   *
+   * Many components were authored for the original dark theme using
+   * pastel `text-{color}-100/200/300` swatches on translucent pastel
+   * backgrounds. On light surfaces those near-white text colors become
+   * invisible. We darken them to the 700 swatch when the document is
+   * NOT in `.dark` mode so badges, pills, status chips, and tinted
+   * labels stay legible on the Linear Light theme without touching
+   * every component file.
+   *
+   * Dark-mode overrides are scoped under `.dark` so the original
+   * dark-theme rendering is preserved.
+   * ────────────────────────────────────────────────────────────────────*/
+  html:not(.dark) .text-violet-100,
+  html:not(.dark) .text-violet-200,
+  html:not(.dark) .text-violet-300 {
+    color: rgb(91 33 182); /* violet-700 */
+  }
+  html:not(.dark) .text-indigo-100,
+  html:not(.dark) .text-indigo-200,
+  html:not(.dark) .text-indigo-300 {
+    color: rgb(67 56 202); /* indigo-700 */
+  }
+  html:not(.dark) .text-fuchsia-100,
+  html:not(.dark) .text-fuchsia-200,
+  html:not(.dark) .text-fuchsia-300 {
+    color: rgb(162 28 175); /* fuchsia-700 */
+  }
+  html:not(.dark) .text-cyan-100,
+  html:not(.dark) .text-cyan-200,
+  html:not(.dark) .text-cyan-300 {
+    color: rgb(14 116 144); /* cyan-700 */
+  }
+  html:not(.dark) .text-sky-100,
+  html:not(.dark) .text-sky-200,
+  html:not(.dark) .text-sky-300 {
+    color: rgb(3 105 161); /* sky-700 */
+  }
+  html:not(.dark) .text-blue-100,
+  html:not(.dark) .text-blue-200,
+  html:not(.dark) .text-blue-300 {
+    color: rgb(29 78 216); /* blue-700 */
+  }
+  html:not(.dark) .text-emerald-100,
+  html:not(.dark) .text-emerald-200,
+  html:not(.dark) .text-emerald-300 {
+    color: rgb(4 120 87); /* emerald-700 */
+  }
+  html:not(.dark) .text-amber-100,
+  html:not(.dark) .text-amber-200,
+  html:not(.dark) .text-amber-300 {
+    color: rgb(180 83 9); /* amber-700 */
+  }
+  html:not(.dark) .text-rose-100,
+  html:not(.dark) .text-rose-200,
+  html:not(.dark) .text-rose-300 {
+    color: rgb(190 18 60); /* rose-700 */
+  }
+
+  /* `bg-nova-gradient/{N}` — Tailwind does NOT apply opacity modifiers
+     to gradient backgrounds, so these classes used to produce no fill
+     at all on light theme (invisible icon chips, empty-state badges,
+     etc.). Restore them as soft, on-brand tints. */
+  .bg-nova-gradient\/10 {
+    background-image: none !important;
+    background-color: rgb(94 106 210 / 0.06);
+  }
+  .bg-nova-gradient\/15 {
+    background-image: none !important;
+    background-color: rgb(94 106 210 / 0.1);
+  }
+  .bg-nova-gradient\/20 {
+    background-image: none !important;
+    background-color: rgb(94 106 210 / 0.12);
+  }
+  .dark .bg-nova-gradient\/10,
+  .dark .bg-nova-gradient\/15,
+  .dark .bg-nova-gradient\/20 {
+    background-image: linear-gradient(
+      135deg,
+      rgba(94, 106, 210, 0.25) 0%,
+      rgba(79, 70, 229, 0.2) 50%,
+      rgba(14, 165, 233, 0.2) 100%
+    ) !important;
+    background-color: transparent;
+  }
+
+  /* But: if the same text color is used INSIDE a primary-filled button
+     (`.bg-primary` / brand gradient buttons), the button has a dark
+     indigo fill and the pastel label is correct — restore near-white. */
+  html:not(.dark) .bg-primary .text-violet-100,
+  html:not(.dark) .bg-primary .text-violet-200,
+  html:not(.dark) .bg-primary .text-indigo-100,
+  html:not(.dark) .bg-primary .text-indigo-200,
+  html:not(.dark) .bg-nova-gradient .text-violet-100,
+  html:not(.dark) .bg-nova-gradient .text-violet-200,
+  html:not(.dark) .bg-nova-gradient .text-indigo-100,
+  html:not(.dark) .bg-nova-gradient .text-indigo-200 {
+    color: rgb(255 255 255 / 0.92);
+  }
 }

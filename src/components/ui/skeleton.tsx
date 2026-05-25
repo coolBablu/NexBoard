@@ -25,12 +25,14 @@ export function Skeleton({
       role="status"
       aria-hidden
       className={cn(
-        "relative overflow-hidden bg-white/[0.045]",
+        // Foreground-based tint adapts to BOTH light and dark themes —
+        // hard-coded white was invisible on the Linear Light surface.
+        "relative overflow-hidden bg-foreground/[0.06] dark:bg-white/[0.045]",
         variant === "default" && "rounded-lg",
         variant === "circle" && "rounded-full",
         variant === "text" && "rounded-md",
         // Shimmer overlay (uses .shimmer keyframe from globals.css)
-        "after:absolute after:inset-0 after:-translate-x-full after:bg-gradient-to-r after:from-transparent after:via-white/[0.08] after:to-transparent after:animate-[skeleton-sweep_1.6s_ease-in-out_infinite]",
+        "after:absolute after:inset-0 after:-translate-x-full after:bg-gradient-to-r after:from-transparent after:via-foreground/[0.05] after:to-transparent after:animate-[skeleton-sweep_1.6s_ease-in-out_infinite] dark:after:via-white/[0.08]",
         className
       )}
       {...props}

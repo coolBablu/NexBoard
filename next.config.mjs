@@ -112,6 +112,21 @@ const nextConfig = {
           { key: "X-Robots-Tag", value: "noindex" },
         ],
       },
+      // Authenticated app shell pages — never cache HTML. The HTML
+      // references fingerprinted JS chunks that change every deploy;
+      // a stale cached HTML would 404 the new chunks. Forcing a
+      // network round-trip for the HTML is cheap and avoids the
+      // "blank page after deploy" foot-gun for users.
+      {
+        source:
+          "/:path((?:dashboard|inbox|calendar|workspace|projects|team|analytics|assistant|settings).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, no-store, max-age=0, must-revalidate",
+          },
+        ],
+      },
     ];
   },
 

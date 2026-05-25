@@ -71,7 +71,8 @@ for (const p of PAGES) {
   await page
     .goto(`${BASE}${p}`, { waitUntil: "domcontentloaded", timeout: 20_000 })
     .catch((e) => console.log(`  ✗ navigation failed: ${e.message}`));
-  await page.waitForTimeout(2800);
+  // Give SWR + dynamic-import skeletons enough time to resolve.
+  await page.waitForTimeout(5500);
 
   // Read computed body background — verifies LIGHT theme actually shipped.
   const bg = await page

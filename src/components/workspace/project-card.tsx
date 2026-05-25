@@ -22,10 +22,14 @@ interface ProjectCardProps {
 }
 
 const statusMap: Record<ProjectStatus, string> = {
-  Active: "bg-violet-500/15 text-violet-200 border-violet-500/25",
-  Planning: "bg-cyan-500/15 text-cyan-200 border-cyan-500/25",
-  Shipped: "bg-emerald-500/15 text-emerald-200 border-emerald-500/25",
-  "At risk": "bg-amber-500/15 text-amber-200 border-amber-500/25",
+  Active:
+    "bg-violet-500/10 text-violet-700 border-violet-500/25 dark:bg-violet-500/15 dark:text-violet-200",
+  Planning:
+    "bg-sky-500/10 text-sky-700 border-sky-500/25 dark:bg-sky-500/15 dark:text-sky-200",
+  Shipped:
+    "bg-emerald-500/10 text-emerald-700 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-200",
+  "At risk":
+    "bg-amber-500/10 text-amber-700 border-amber-500/25 dark:bg-amber-500/15 dark:text-amber-200",
 };
 
 export function ProjectCard({
