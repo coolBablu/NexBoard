@@ -15,7 +15,10 @@ const PASS = "novaflow123";
 
 const PAGES = [
   { path: "/dashboard", expect: ["Dashboard", "Alex"] },
+  { path: "/inbox", expect: ["Inbox", "Mentions"] },
+  { path: "/calendar", expect: ["Calendar", "Today"] },
   { path: "/workspace", expect: ["Projects", "Payments"] },
+  { path: "/projects", expect: ["Projects", "Active"] },
   { path: "/team", expect: ["Chat", "Activity", "general"] },
   { path: "/assistant", expect: ["Nova"] },
   { path: "/analytics", expect: ["Analytics"] },
