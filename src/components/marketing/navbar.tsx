@@ -112,17 +112,18 @@ export function MarketingNavbar() {
                   href={link.href}
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
-                    "relative rounded-lg px-3 py-1.5 text-sm transition-colors",
+                    "relative rounded-full px-4 py-1.5 text-sm transition-colors",
                     isActive
                       ? "text-foreground"
-                      : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="nav-active-pill"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      className="absolute inset-0 -z-0 rounded-lg bg-foreground/[0.06]"
+                      aria-hidden
+                      className="absolute inset-0 rounded-full border border-violet-500/60 bg-violet-500/[0.04] dark:border-violet-400/60 dark:bg-violet-400/[0.06]"
                     />
                   )}
                   <span className="relative">{link.label}</span>
