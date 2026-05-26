@@ -40,3 +40,9 @@ yarn-error.log*
 next-env.d.ts
 theme-screens*.png
 build-out.txt
+
+# local screenshot output / scratch files
+/screens
+/dialog-screens
+/snap-*.png
+.commit-msg.txt
