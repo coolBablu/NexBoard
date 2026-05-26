@@ -14,6 +14,10 @@ import {
   Users,
   ChevronRight,
   MessageSquare,
+  Pencil,
+  Trash2,
+  Check,
+  X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -59,6 +63,7 @@ interface MessageDTO {
   mentions: string[];
   attachments: AttachmentDraft[];
   createdAt: string;
+  editedAt?: string | null;
   author: { id: string; name: string; handle: string; image: string | null };
 }
 
@@ -428,6 +433,7 @@ function ChannelsSidebar({
 function ChannelArea({ channel }: { channel: ChannelDTO | null }) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
+  const userRole = (session?.user as { role?: string } | undefined)?.role ?? null;
   const key = channel ? `/api/channels/${channel.id}/messages` : null;
   const { data, isLoading } = useSWR<{ messages: MessageDTO[] }>(key, {
     refreshInterval: 4_000,
@@ -572,7 +578,9 @@ function ChannelArea({ channel }: { channel: ChannelDTO | null }) {
                   message={m}
                   collapsed={sameAuthor}
                   currentUserId={currentUserId}
+                  userRole={userRole}
                   members={members}
+                  channelId={channel.id}
                 />
               );
             })}
@@ -645,15 +653,109 @@ function ChatMessage({
   message,
   collapsed,
   currentUserId,
+  userRole,
   members,
+  channelId,
 }: {
   message: MessageDTO;
   collapsed: boolean;
   currentUserId?: string | null;
+  userRole?: string | null;
   members: Member[];
+  channelId: string;
 }) {
   const isMentioned =
     currentUserId && message.mentions?.includes(currentUserId);
+  const isOwn = currentUserId && message.author.id === currentUserId;
+  const canDelete = isOwn || userRole === "super_admin";
+
+  const [editing, setEditing] = React.useState(false);
+  const [draft, setDraft] = React.useState(message.body);
+  const [busy, setBusy] = React.useState(false);
+
+  // Sync local draft when the message updates externally (e.g. polling
+  // brings in a fresh edit while we're not actively editing).
+  React.useEffect(() => {
+    if (!editing) setDraft(message.body);
+  }, [message.body, editing]);
+
+  const messagesKey = `/api/channels/${channelId}/messages`;
+
+  async function saveEdit() {
+    const next = draft.trim();
+    if (!next || busy) return;
+    if (next === message.body) {
+      setEditing(false);
+      return;
+    }
+    setBusy(true);
+    // Optimistic: patch the cached list immediately so the bubble
+    // updates with no perceived latency.
+    mutate(
+      messagesKey,
+      (curr: { messages: MessageDTO[] } | undefined) => {
+        if (!curr) return curr;
+        return {
+          messages: curr.messages.map((m) =>
+            m.id === message.id
+              ? { ...m, body: next, editedAt: new Date().toISOString() }
+              : m
+          ),
+        };
+      },
+      false
+    );
+    try {
+      const res = await fetch(
+        `/api/channels/${channelId}/messages/${message.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body: next }),
+        }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Edit failed (${res.status})`);
+      }
+      setEditing(false);
+    } catch (err) {
+      toast.fromError(err, "Couldn't edit message");
+      void mutate(messagesKey);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteMessage() {
+    if (!confirm("Delete this message? This cannot be undone.")) return;
+    setBusy(true);
+    mutate(
+      messagesKey,
+      (curr: { messages: MessageDTO[] } | undefined) => {
+        if (!curr) return curr;
+        return { messages: curr.messages.filter((m) => m.id !== message.id) };
+      },
+      false
+    );
+    try {
+      const res = await fetch(
+        `/api/channels/${channelId}/messages/${message.id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Delete failed (${res.status})`);
+      }
+      toast.success("Message deleted");
+    } catch (err) {
+      toast.fromError(err, "Couldn't delete message");
+      void mutate(messagesKey);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <motion.div
       layout
@@ -662,7 +764,7 @@ function ChatMessage({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.18 }}
       className={cn(
-        "flex gap-3",
+        "group relative flex gap-3",
         collapsed && "-mt-3",
         isMentioned &&
           "-mx-2 rounded-lg border-l-2 border-amber-400/60 bg-amber-500/[0.03] px-2 py-1"
@@ -686,19 +788,113 @@ function ChatMessage({
             <span className="text-[10px] text-muted-foreground/70">
               · {formatTime(message.createdAt)}
             </span>
+            {message.editedAt && (
+              <span
+                className="text-[10px] text-muted-foreground/60"
+                title={`Edited ${new Date(message.editedAt).toLocaleString()}`}
+              >
+                (edited)
+              </span>
+            )}
           </div>
         )}
-        <div className="mt-0.5 text-sm">
-          <MentionedText
-            text={message.body}
-            currentUserId={currentUserId}
-            members={members}
-          />
-        </div>
-        {message.attachments && message.attachments.length > 0 && (
+
+        {editing ? (
+          <div className="mt-1 rounded-lg border border-violet-500/30 bg-violet-500/[0.04] p-2">
+            <textarea
+              autoFocus
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setDraft(message.body);
+                  setEditing(false);
+                }
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  void saveEdit();
+                }
+              }}
+              rows={Math.min(6, Math.max(2, draft.split("\n").length))}
+              className="w-full resize-none rounded-md border border-transparent bg-transparent px-2 py-1 text-sm outline-none focus:border-violet-400/40"
+              disabled={busy}
+            />
+            <div className="mt-1.5 flex items-center justify-between">
+              <p className="font-mono text-[9px] text-muted-foreground/70">
+                Enter to save · Esc to cancel
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft(message.body);
+                    setEditing(false);
+                  }}
+                  disabled={busy}
+                  className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-foreground"
+                  aria-label="Cancel"
+                >
+                  <X className="size-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void saveEdit()}
+                  disabled={busy || !draft.trim()}
+                  className="grid size-6 place-items-center rounded text-violet-500 transition-colors hover:bg-violet-500/10 disabled:opacity-50 dark:text-violet-300"
+                  aria-label="Save"
+                >
+                  {busy ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Check className="size-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-0.5 text-sm">
+            <MentionedText
+              text={message.body}
+              currentUserId={currentUserId}
+              members={members}
+            />
+          </div>
+        )}
+
+        {!editing && message.attachments && message.attachments.length > 0 && (
           <AttachmentList items={message.attachments} />
         )}
       </div>
+
+      {/* Hover-visible action toolbar — sits at the top-right of the bubble. */}
+      {!editing && (isOwn || canDelete) && (
+        <div className="pointer-events-none absolute -top-2 right-2 flex items-center gap-0.5 rounded-md border border-foreground/[0.08] bg-background/95 px-0.5 py-0.5 opacity-0 shadow-sm backdrop-blur transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
+          {isOwn && (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              title="Edit message"
+              aria-label="Edit message"
+              className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
+            >
+              <Pencil className="size-3" />
+            </button>
+          )}
+          {canDelete && (
+            <button
+              type="button"
+              onClick={() => void deleteMessage()}
+              disabled={busy}
+              title="Delete message"
+              aria-label="Delete message"
+              className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300"
+            >
+              <Trash2 className="size-3" />
+            </button>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }

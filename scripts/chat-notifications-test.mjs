@@ -184,6 +184,60 @@ async function run() {
     fail(`expected 1 coalesced notif, got ${channelNotifs.length}`);
   }
 
+  // ── Edit + delete on own messages ───────────────────────────────────
+  step(13, "alex edits his own DM message");
+  const dmListRes = await alexCtx.get(`${BASE}/api/channels/${dm.id}/messages`);
+  const dmList = (await dmListRes.json()).messages ?? [];
+  const ownMsg = dmList.find((m) => m.author.id === alex.id);
+  if (!ownMsg) {
+    fail("alex's own DM message not found in listing");
+    return;
+  }
+  const editRes = await alexCtx.patch(
+    `${BASE}/api/channels/${dm.id}/messages/${ownMsg.id}`,
+    { data: { body: "(edited) updated DM body" } }
+  );
+  if (editRes.status() !== 200) {
+    fail(`edit returned ${editRes.status()}`);
+  } else {
+    const edited = await editRes.json();
+    if (edited.body.startsWith("(edited)") && edited.editedAt) {
+      ok(`edit ok — editedAt=${edited.editedAt}`);
+    } else {
+      fail(`edit response missing body/editedAt: ${JSON.stringify(edited)}`);
+    }
+  }
+
+  step(14, "peer cannot edit alex's message (403)");
+  const peerEditRes = await peerCtx.patch(
+    `${BASE}/api/channels/${dm.id}/messages/${ownMsg.id}`,
+    { data: { body: "peer trying to hijack" } }
+  );
+  if (peerEditRes.status() === 403) ok("peer correctly blocked from editing");
+  else fail(`expected 403, got ${peerEditRes.status()}`);
+
+  step(15, "peer cannot delete alex's message (403)");
+  const peerDelRes = await peerCtx.delete(
+    `${BASE}/api/channels/${dm.id}/messages/${ownMsg.id}`
+  );
+  if (peerDelRes.status() === 403) ok("peer correctly blocked from deleting");
+  else fail(`expected 403, got ${peerDelRes.status()}`);
+
+  step(16, "alex deletes his own DM message");
+  const delRes = await alexCtx.delete(
+    `${BASE}/api/channels/${dm.id}/messages/${ownMsg.id}`
+  );
+  if (delRes.status() === 200) ok("delete ok");
+  else fail(`delete returned ${delRes.status()}`);
+
+  step(17, "deleted message is gone from the listing");
+  const afterDel = await (
+    await alexCtx.get(`${BASE}/api/channels/${dm.id}/messages`)
+  ).json();
+  const stillThere = (afterDel.messages ?? []).some((m) => m.id === ownMsg.id);
+  if (!stillThere) ok("message no longer in the channel listing");
+  else fail("message still present after delete");
+
   await alexCtx.dispose();
   await peerCtx.dispose();
 
