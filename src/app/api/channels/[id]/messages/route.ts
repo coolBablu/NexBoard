@@ -120,6 +120,18 @@ export async function POST(req: Request, ctx: RouteContext) {
     const channel = await Channel.findOne({ _id: id, workspace: ws._id });
     if (!channel) return notFound("Channel not found");
 
+    // Private channels (incl. DMs) — only listed members may post.
+    // Public channels are open to every active workspace member.
+    if (
+      (channel.isPrivate || channel.type === "dm") &&
+      !(channel.members ?? []).some((m) => String(m) === session.user.id)
+    ) {
+      return NextResponse.json(
+        { error: "Not a member of this channel" },
+        { status: 403 }
+      );
+    }
+
     // Resolve mentions
     const handles = parseMentions(parsed.data.body);
     let mentionIds: string[] = [];

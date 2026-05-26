@@ -13,6 +13,7 @@ import {
   Smile,
   Users,
   ChevronRight,
+  MessageSquare,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -81,17 +82,47 @@ interface Member {
  */
 export function TeamChat({ initialChannelId }: { initialChannelId?: string }) {
   const [activeId, setActiveId] = React.useState<string | null>(initialChannelId ?? null);
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
 
   const { data: chData } = useSWR<{ channels: ChannelDTO[] }>("/api/channels", {
     refreshInterval: 20_000,
   });
+  const { data: membersData } = useSWR<{ members: Member[] }>("/api/members");
   const channels = chData?.channels ?? [];
+  const members = membersData?.members ?? [];
 
   React.useEffect(() => {
     if (!activeId && channels.length > 0) {
-      setActiveId(channels[0].id);
+      // Prefer regular channels over DMs as the first auto-pick.
+      const first =
+        channels.find((c) => c.type === "channel") ?? channels[0];
+      setActiveId(first.id);
     }
   }, [channels, activeId]);
+
+  /** Find-or-create a 1:1 DM with the given member, then switch to it. */
+  const startDM = React.useCallback(
+    async (memberId: string) => {
+      try {
+        const res = await fetch("/api/channels/dm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: memberId }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error("Couldn't open DM", { description: data.error });
+          return;
+        }
+        await mutate("/api/channels");
+        setActiveId(data.id);
+      } catch (err) {
+        toast.fromError(err, "Couldn't open DM");
+      }
+    },
+    []
+  );
 
   const active = channels.find((c) => c.id === activeId) || null;
 
@@ -99,13 +130,32 @@ export function TeamChat({ initialChannelId }: { initialChannelId?: string }) {
     <div className="grid h-[calc(100vh-13rem)] grid-cols-[260px_1fr] gap-4 xl:grid-cols-[240px_1fr_260px]">
       <ChannelsSidebar
         channels={channels}
+        members={members}
+        currentUserId={currentUserId}
         activeId={activeId}
         onSelect={setActiveId}
+        onStartDM={startDM}
       />
       <ChannelArea channel={active} />
-      <MembersSidebar />
+      <MembersSidebar
+        currentUserId={currentUserId}
+        onStartDM={startDM}
+      />
     </div>
   );
+}
+
+/** Resolve a DM's deterministic "dm-<a>-<b>" name to the OTHER member's display info. */
+function resolveDMPeer(
+  dmName: string,
+  currentUserId: string | undefined,
+  members: Member[]
+): Member | null {
+  if (!currentUserId) return null;
+  const ids = dmName.replace(/^dm-/, "").split("-");
+  const otherId = ids.find((id) => id !== currentUserId);
+  if (!otherId) return null;
+  return members.find((m) => m.id === otherId) ?? null;
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -114,17 +164,26 @@ export function TeamChat({ initialChannelId }: { initialChannelId?: string }) {
 
 function ChannelsSidebar({
   channels,
+  members,
+  currentUserId,
   activeId,
   onSelect,
+  onStartDM,
 }: {
   channels: ChannelDTO[];
+  members: Member[];
+  currentUserId: string | undefined;
   activeId: string | null;
   onSelect: (id: string) => void;
+  onStartDM: (memberId: string) => void;
 }) {
   const [creating, setCreating] = React.useState(false);
   const [name, setName] = React.useState("");
   const [topic, setTopic] = React.useState("");
   const [busy, setBusy] = React.useState(false);
+
+  const regularChannels = channels.filter((c) => c.type === "channel");
+  const dmChannels = channels.filter((c) => c.type === "dm");
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -172,36 +231,129 @@ function ChannelsSidebar({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto pr-1">
-          {channels.length === 0 ? (
+          {regularChannels.length === 0 && dmChannels.length === 0 ? (
             <p className="px-2 py-3 text-xs text-muted-foreground">
               No channels yet — create one to get started.
             </p>
           ) : (
-            channels.map((c) => {
-              const Icon = c.isPrivate ? Lock : Hash;
-              const isActive = c.id === activeId;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => onSelect(c.id)}
-                  className={cn(
-                    "group relative flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors",
-                    isActive
-                      ? "bg-white/[0.05] text-foreground"
-                      : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
-                  )}
-                >
-                  <Icon className="size-3.5 shrink-0 text-muted-foreground" />
-                  <span className="flex-1 truncate text-sm">{c.name}</span>
-                  {isActive && (
-                    <motion.span
-                      layoutId="ch-active"
-                      className="absolute inset-y-1 left-0 w-0.5 rounded-r-full bg-violet-400"
-                    />
-                  )}
-                </button>
-              );
-            })
+            <>
+              {regularChannels.map((c) => {
+                const Icon = c.isPrivate ? Lock : Hash;
+                const isActive = c.id === activeId;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => onSelect(c.id)}
+                    className={cn(
+                      "group relative flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors",
+                      isActive
+                        ? "bg-white/[0.05] text-foreground"
+                        : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="size-3.5 shrink-0 text-muted-foreground" />
+                    <span className="flex-1 truncate text-sm">{c.name}</span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="ch-active"
+                        className="absolute inset-y-1 left-0 w-0.5 rounded-r-full bg-violet-400"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+
+              {dmChannels.length > 0 && (
+                <div className="mt-4">
+                  <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/80">
+                    Direct messages
+                  </p>
+                  {dmChannels.map((c) => {
+                    const peer = resolveDMPeer(c.name, currentUserId, members);
+                    const isActive = c.id === activeId;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => onSelect(c.id)}
+                        className={cn(
+                          "group relative flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors",
+                          isActive
+                            ? "bg-white/[0.05] text-foreground"
+                            : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                        )}
+                      >
+                        {peer ? (
+                          <div className="relative shrink-0">
+                            <Avatar className="h-5 w-5">
+                              <AvatarImage src={peer.image} alt={peer.name} />
+                              <AvatarFallback className="text-[10px]">
+                                {peer.name[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                            <PresenceDot
+                              state={peer.presence}
+                              size="xs"
+                              className="absolute -bottom-0.5 -right-0.5"
+                            />
+                          </div>
+                        ) : (
+                          <MessageSquare className="size-3.5 shrink-0 text-muted-foreground" />
+                        )}
+                        <span className="flex-1 truncate text-sm">
+                          {peer?.name ?? c.topic ?? "Direct message"}
+                        </span>
+                        {isActive && (
+                          <motion.span
+                            layoutId="ch-active"
+                            className="absolute inset-y-1 left-0 w-0.5 rounded-r-full bg-violet-400"
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {members.length > 0 && currentUserId && (
+                <div className="mt-4">
+                  <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/80">
+                    Start a DM
+                  </p>
+                  {members
+                    .filter(
+                      (m) =>
+                        m.id !== currentUserId &&
+                        !dmChannels.some((c) =>
+                          c.name.includes(m.id)
+                        )
+                    )
+                    .slice(0, 6)
+                    .map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => onStartDM(m.id)}
+                        className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground"
+                      >
+                        <div className="relative shrink-0">
+                          <Avatar className="h-5 w-5">
+                            <AvatarImage src={m.image} alt={m.name} />
+                            <AvatarFallback className="text-[10px]">
+                              {m.name[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <PresenceDot
+                            state={m.presence}
+                            size="xs"
+                            className="absolute -bottom-0.5 -right-0.5"
+                          />
+                        </div>
+                        <span className="flex-1 truncate text-sm">{m.name}</span>
+                        <Plus className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </button>
+                    ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </aside>
@@ -431,6 +583,7 @@ function ChannelArea({ channel }: { channel: ChannelDTO | null }) {
             <FileAttachmentButton
               attachments={attachments}
               onChange={setAttachments}
+              channelId={channel?.id}
             />
             <button
               type="button"
@@ -557,7 +710,13 @@ function EmptyChannel({ name }: { name: string }) {
 // Members sidebar (right)
 // ─────────────────────────────────────────────────────────────────────
 
-function MembersSidebar() {
+function MembersSidebar({
+  currentUserId,
+  onStartDM,
+}: {
+  currentUserId: string | undefined;
+  onStartDM: (memberId: string) => void;
+}) {
   const { data, isLoading } = useSWR<{ members: Member[] }>("/api/members", {
     refreshInterval: 20_000,
   });
@@ -593,9 +752,27 @@ function MembersSidebar() {
           </div>
         ) : (
           <>
-            <MemberGroup title="Online" tone="emerald" members={online} />
-            <MemberGroup title="Away" tone="amber" members={away} />
-            <MemberGroup title="Offline" tone="zinc" members={offline} />
+            <MemberGroup
+              title="Online"
+              tone="emerald"
+              members={online}
+              currentUserId={currentUserId}
+              onStartDM={onStartDM}
+            />
+            <MemberGroup
+              title="Away"
+              tone="amber"
+              members={away}
+              currentUserId={currentUserId}
+              onStartDM={onStartDM}
+            />
+            <MemberGroup
+              title="Offline"
+              tone="zinc"
+              members={offline}
+              currentUserId={currentUserId}
+              onStartDM={onStartDM}
+            />
           </>
         )}
       </div>
@@ -607,10 +784,14 @@ function MemberGroup({
   title,
   tone,
   members,
+  currentUserId,
+  onStartDM,
 }: {
   title: string;
   tone: "emerald" | "amber" | "zinc";
   members: Member[];
+  currentUserId: string | undefined;
+  onStartDM: (memberId: string) => void;
 }) {
   const [open, setOpen] = React.useState(true);
   if (members.length === 0) return null;
@@ -636,34 +817,52 @@ function MemberGroup({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            {members.map((m) => (
-              <div
-                key={m.id}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-white/[0.04]"
-              >
-                <div className="relative">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={m.image} alt={m.name} />
-                    <AvatarFallback>{m.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <PresenceDot
-                    state={m.presence}
-                    size="xs"
-                    className="absolute -bottom-0.5 -right-0.5"
-                  />
+            {members.map((m) => {
+              const isSelf = m.id === currentUserId;
+              return (
+                <div
+                  key={m.id}
+                  className="group flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-white/[0.04]"
+                >
+                  <div className="relative">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={m.image} alt={m.name} />
+                      <AvatarFallback>{m.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <PresenceDot
+                      state={m.presence}
+                      size="xs"
+                      className="absolute -bottom-0.5 -right-0.5"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={cn(
+                        "truncate text-xs",
+                        tone === "zinc" ? "text-muted-foreground" : "text-foreground/95"
+                      )}
+                    >
+                      {m.name}
+                      {isSelf && (
+                        <span className="ml-1.5 text-[10px] text-muted-foreground">
+                          (you)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  {!isSelf && currentUserId && (
+                    <button
+                      onClick={() => onStartDM(m.id)}
+                      title={`Message ${m.name}`}
+                      aria-label={`Message ${m.name}`}
+                      className="grid size-6 shrink-0 place-items-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-white/[0.06] hover:text-violet-300 group-hover:opacity-100"
+                    >
+                      <MessageSquare className="size-3" />
+                    </button>
+                  )}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={cn(
-                      "truncate text-xs",
-                      tone === "zinc" ? "text-muted-foreground" : "text-foreground/95"
-                    )}
-                  >
-                    {m.name}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>

@@ -27,18 +27,31 @@ interface FileAttachmentButtonProps {
   max?: number;
   maxBytes?: number;
   className?: string;
+  /** Linkage so the file shows up under the right channel on /files. */
+  channelId?: string;
 }
 
-const MAX_BYTES_DEFAULT = 2 * 1024 * 1024; // 2 MB per file (data-URL friendly)
+const MAX_BYTES_DEFAULT = 10 * 1024 * 1024; // 10 MB — server enforces too
 
-/** Reads a single File as a data: URL — production should upload to blob storage. */
-function readAsDataURL(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
+/** POST a single File to /api/upload; returns the attachment draft. */
+async function uploadFile(
+  file: File,
+  channelId?: string
+): Promise<AttachmentDraft> {
+  const fd = new FormData();
+  fd.append("file", file);
+  if (channelId) fd.append("channelId", channelId);
+  const res = await fetch("/api/upload", { method: "POST", body: fd });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || `Upload failed (${res.status})`);
+  }
+  return {
+    name: data.name,
+    mime: data.mime,
+    size: data.size,
+    url: data.url,
+  };
 }
 
 export function FileAttachmentButton({
@@ -47,6 +60,7 @@ export function FileAttachmentButton({
   max = 4,
   maxBytes = MAX_BYTES_DEFAULT,
   className,
+  channelId,
 }: FileAttachmentButtonProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [busy, setBusy] = React.useState(false);
@@ -57,12 +71,29 @@ export function FileAttachmentButton({
     const next = [...attachments];
     for (const file of Array.from(files)) {
       if (next.length >= max) break;
-      if (file.size > maxBytes) continue;
+      if (file.size > maxBytes) {
+        // Surface skipped-file feedback if a toast helper is available.
+        // We fall back to a silent skip to avoid hard-coding a toast dep.
+        try {
+          const { toast } = await import("@/lib/toast");
+          toast.error(`${file.name} skipped`, {
+            description: `Max ${Math.round(maxBytes / (1024 * 1024))} MB per file.`,
+          });
+        } catch {
+          /* noop */
+        }
+        continue;
+      }
       try {
-        const url = await readAsDataURL(file);
-        next.push({ name: file.name, mime: file.type || "application/octet-stream", size: file.size, url });
-      } catch {
-        // skip
+        const draft = await uploadFile(file, channelId);
+        next.push(draft);
+      } catch (err) {
+        try {
+          const { toast } = await import("@/lib/toast");
+          toast.fromError(err, `Couldn't upload ${file.name}`);
+        } catch {
+          /* noop */
+        }
       }
     }
     onChange(next);

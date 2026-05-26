@@ -9,6 +9,7 @@ import {
   Folder,
   MessagesSquare,
   Shield,
+  Files,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const navGroups: NavGroup[] = [
       { label: "Workspace", href: "/workspace", icon: Users },
       { label: "Projects", href: "/projects", icon: Folder },
       { label: "Team", href: "/team", icon: MessagesSquare, badge: "Live" },
+      { label: "Files", href: "/files", icon: Files },
       { label: "Analytics", href: "/analytics", icon: BarChart3 },
     ],
   },
