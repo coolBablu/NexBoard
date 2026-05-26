@@ -89,12 +89,14 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
     role: "member" as const,
     permissions: defaultPermissionsFor("member"),
     approvedAt: now,
+    passwordHash, // every demo user shares DEMO_PASSWORD for easy multi-account testing
   };
   const adminDefaults = {
     status: "active" as const,
     role: "admin" as const,
     permissions: defaultPermissionsFor("admin"),
     approvedAt: now,
+    passwordHash, // every demo user shares DEMO_PASSWORD for easy multi-account testing
   };
 
   const [demoUser, maya, daniel, sara, jordan, aisha] = await User.create([

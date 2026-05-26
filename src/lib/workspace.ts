@@ -3,8 +3,15 @@ import { Workspace, type WorkspaceDoc } from "@/models/Workspace";
 import type { Types } from "mongoose";
 
 /**
- * Resolve the user's default workspace. If none exists yet (e.g. for
- * OAuth-created accounts), bootstrap one automatically.
+ * Resolve the user's default workspace.
+ *   1. If `user.defaultWorkspace` is set and still exists -> use it.
+ *   2. Otherwise, prefer any existing workspace the user is already a
+ *      member of (admin-invited members get auto-attached here).
+ *   3. Only as a last resort, bootstrap a brand-new personal workspace.
+ *
+ * Without step 2, invited members would silently end up in their own
+ * isolated workspace and stop seeing the admin's channels, files,
+ * notifications, etc.
  */
 export async function getOrCreateDefaultWorkspace(
   userId: string
@@ -17,7 +24,16 @@ export async function getOrCreateDefaultWorkspace(
     if (ws) return ws as WorkspaceDoc & { _id: Types.ObjectId };
   }
 
-  // Bootstrap: deterministic slug from user id
+  // Prefer an existing membership over creating a new workspace.
+  const existing = await Workspace.findOne({ "members.user": user._id }).sort({
+    createdAt: 1,
+  });
+  if (existing) {
+    user.defaultWorkspace = existing._id;
+    await user.save();
+    return existing as WorkspaceDoc & { _id: Types.ObjectId };
+  }
+
   const base = (user.name || user.email.split("@")[0])
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")

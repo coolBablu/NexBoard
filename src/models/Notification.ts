@@ -16,6 +16,10 @@ export const NOTIFICATION_KINDS = [
   "ai_insight",
   "anomaly",
   "system",
+  /** New direct message from another member. */
+  "dm",
+  /** New message in a public/private channel the recipient is in. */
+  "message",
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 

@@ -42,7 +42,9 @@ interface NotificationDTO {
     | "due_soon"
     | "ai_insight"
     | "anomaly"
-    | "system";
+    | "system"
+    | "dm"
+    | "message";
   priority: "low" | "normal" | "high";
   title: string;
   body: string;
@@ -101,9 +103,19 @@ const KIND_META: Record<
     tone: "text-zinc-300 bg-zinc-500/15",
     label: "System",
   },
+  dm: {
+    icon: MessageSquare,
+    tone: "text-violet-300 bg-violet-500/15",
+    label: "Direct message",
+  },
+  message: {
+    icon: MessageSquare,
+    tone: "text-cyan-300 bg-cyan-500/15",
+    label: "Channel",
+  },
 };
 
-type FilterTab = "all" | "unread" | "mentions" | "ai";
+type FilterTab = "all" | "unread" | "messages" | "mentions" | "ai";
 
 export default function InboxPage() {
   const [tab, setTab] = React.useState<FilterTab>("all");
@@ -120,6 +132,10 @@ export default function InboxPage() {
     switch (tab) {
       case "unread":
         return all.filter((n) => !n.readAt);
+      case "messages":
+        return all.filter(
+          (n) => n.kind === "dm" || n.kind === "message" || n.kind === "mention"
+        );
       case "mentions":
         return all.filter((n) => n.kind === "mention");
       case "ai":
@@ -258,6 +274,7 @@ export default function InboxPage() {
               </span>
             )}
           </TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
           <TabsTrigger value="mentions">Mentions</TabsTrigger>
           <TabsTrigger value="ai">AI</TabsTrigger>
         </TabsList>

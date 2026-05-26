@@ -8,7 +8,7 @@ import { User } from "@/models/User";
 import { requireSession, badRequest, notFound, serverError } from "@/lib/api";
 import { getOrCreateDefaultWorkspace } from "@/lib/workspace";
 import { parseMentions, resolveMentionsToIds, handleFor } from "@/lib/mentions";
-import { notifyMany } from "@/lib/notifications";
+import { notify, notifyMany, notifyCoalesced } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -167,19 +167,92 @@ export async function POST(req: Request, ctx: RouteContext) {
       { $set: { lastSeenAt: new Date() } }
     );
 
-    // Notify mentions only — broadcasting to every channel member would
-    // spam. Channel timelines are how non-mentioned members keep up.
+    // Look up the sender once — used in every notification title below.
+    const sender = await User.findById(session.user.id, {
+      name: 1,
+      email: 1,
+    }).lean();
+    const senderName =
+      sender?.name?.trim() || sender?.email?.split("@")[0] || "Someone";
+    const preview = parsed.data.body.slice(0, 240).trim();
+    const channelUrl = `/team?channel=${channel._id}`;
+
+    // ── Mentions — always high-priority, never coalesced (the user
+    //     explicitly named them, so each is its own event).
     if (mentionIds.length) {
       await notifyMany(mentionIds, {
         workspace: ws._id,
         actor: session.user.id,
         kind: "mention",
         priority: "high",
-        title: `You were mentioned in #${channel.name}`,
-        body: parsed.data.body.slice(0, 240),
-        url: `/team?channel=${channel._id}`,
+        title:
+          channel.type === "dm"
+            ? `${senderName} mentioned you in a DM`
+            : `${senderName} mentioned you in #${channel.name}`,
+        body: preview,
+        url: channelUrl,
         entity: { type: "conversation", id: channel._id },
       });
+    }
+
+    if (channel.type === "dm") {
+      // ── Direct messages — notify the other participant every time.
+      //     DMs are personal; we never coalesce. Mentions in DMs are
+      //     already covered above, so skip if they were the mention
+      //     target (avoid double-notify).
+      const otherIds = (channel.members ?? [])
+        .map(String)
+        .filter(
+          (m) =>
+            m !== session.user.id &&
+            !mentionIds.includes(m)
+        );
+      await Promise.all(
+        otherIds.map((rid) =>
+          notify({
+            workspace: ws._id,
+            recipient: rid,
+            actor: session.user.id,
+            kind: "dm",
+            priority: "high",
+            title: `${senderName} sent you a message`,
+            body: preview || "(attachment)",
+            url: channelUrl,
+            entity: { type: "conversation", id: channel._id },
+          })
+        )
+      );
+    } else {
+      // ── Channel messages — notify other channel members (excluding
+      //     sender + mentioned users). Coalesced so a chatty burst
+      //     stays a single bell badge per channel per 5 minutes.
+      //     For public channels we only ping the workspace members who
+      //     opted in via `channel.members`; if `members` is empty (the
+      //     public default), we fan out to everyone in the workspace.
+      const audience =
+        channel.members && channel.members.length > 0
+          ? channel.members.map(String)
+          : (ws.members ?? []).map((m) => String(m.user));
+      const recipients = Array.from(new Set(audience)).filter(
+        (m) =>
+          m !== session.user.id &&
+          !mentionIds.includes(m)
+      );
+      await Promise.all(
+        recipients.map((rid) =>
+          notifyCoalesced({
+            workspace: ws._id,
+            recipient: rid,
+            actor: session.user.id,
+            kind: "message",
+            priority: "normal",
+            title: `New message in #${channel.name}`,
+            body: `${senderName}: ${preview || "(attachment)"}`,
+            url: channelUrl,
+            entity: { type: "conversation", id: channel._id },
+          })
+        )
+      );
     }
 
     return NextResponse.json(

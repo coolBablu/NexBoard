@@ -35,7 +35,9 @@ interface NotificationDTO {
     | "due_soon"
     | "ai_insight"
     | "anomaly"
-    | "system";
+    | "system"
+    | "dm"
+    | "message";
   priority: "low" | "normal" | "high";
   title: string;
   body: string;
@@ -62,6 +64,8 @@ const KIND_META: Record<
   ai_insight: { icon: Sparkles, tone: "text-violet-300 bg-violet-500/15" },
   anomaly: { icon: AlertTriangle, tone: "text-rose-300 bg-rose-500/15" },
   system: { icon: CheckCircle2, tone: "text-zinc-300 bg-zinc-500/15" },
+  dm: { icon: MessageSquare, tone: "text-violet-300 bg-violet-500/15" },
+  message: { icon: MessageSquare, tone: "text-cyan-300 bg-cyan-500/15" },
 };
 
 function timeAgo(iso: string): string {
@@ -78,11 +82,40 @@ export function NotificationBell() {
   const [open, setOpen] = React.useState(false);
   const { data, isLoading } = useSWR<NotificationsResponse>(
     "/api/notifications",
-    { refreshInterval: 25_000, revalidateOnFocus: true }
+    { refreshInterval: 15_000, revalidateOnFocus: true }
   );
 
   const unread = data?.unreadCount ?? 0;
   const items = data?.notifications ?? [];
+
+  // Track what we've already toasted so a single new DM doesn't pop a
+  // toast on every 15s refresh. First mount seeds the set silently.
+  const seenIdsRef = React.useRef<Set<string> | null>(null);
+  React.useEffect(() => {
+    if (!data) return;
+    if (seenIdsRef.current === null) {
+      seenIdsRef.current = new Set(items.map((n) => n.id));
+      return;
+    }
+    const seen = seenIdsRef.current;
+    for (const n of items) {
+      if (seen.has(n.id)) continue;
+      seen.add(n.id);
+      // Already-read notifications would only appear here if a backfill
+      // happened — skip them so we don't toast on history changes.
+      if (n.readAt) continue;
+      // Only the high-signal kinds get a toast pop; channel-message
+      // notifications bump the badge silently.
+      if (n.kind === "dm" || n.kind === "mention" || n.kind === "assigned") {
+        toast.info(n.title, {
+          description: n.body?.slice(0, 140),
+          action: n.url
+            ? { label: "Open", onClick: () => (window.location.href = n.url!) }
+            : undefined,
+        });
+      }
+    }
+  }, [data, items]);
 
   async function markRead(id: string) {
     mutate(

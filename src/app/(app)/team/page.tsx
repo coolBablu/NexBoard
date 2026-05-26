@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppShell } from "@/components/app/app-shell";
 import { TeamChat } from "@/components/team/team-chat";
@@ -16,6 +17,9 @@ import { ActivityTimeline } from "@/components/team/activity-timeline";
  * (Files, Pinned, Decisions) later without restructuring.
  */
 export default function TeamPage() {
+  const searchParams = useSearchParams();
+  const initialChannelId = searchParams.get("channel") || undefined;
+
   return (
     <AppShell
       title="Team"
@@ -28,7 +32,7 @@ export default function TeamPage() {
         </TabsList>
 
         <TabsContent value="chat" className="mt-4">
-          <TeamChat />
+          <TeamChat initialChannelId={initialChannelId} />
         </TabsContent>
 
         <TabsContent value="activity" className="mt-4">
