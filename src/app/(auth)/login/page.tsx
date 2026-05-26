@@ -15,10 +15,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AuthLayout } from "@/components/auth/auth-layout";
-import { SocialButtons } from "@/components/auth/social-buttons";
 import { FormField } from "@/components/auth/form-field";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "@/lib/toast";
 
 export default function LoginPage() {
@@ -89,15 +87,6 @@ function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <SocialButtons callbackUrl={callbackUrl} />
-
-      <div className="relative">
-        <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-3 text-xs text-muted-foreground">
-          or with email
-        </span>
-      </div>
-
       <AnimatePresence>
         {formError && (
           <motion.div
