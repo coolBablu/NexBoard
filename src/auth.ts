@@ -9,13 +9,16 @@ import { z } from "zod";
 
 import clientPromise from "@/lib/mongodb-client";
 import { dbConnect } from "@/lib/mongodb";
-import { User } from "@/models/User";
+import { User, type AccountStatus, type UserRole } from "@/models/User";
+import { ensureDemoSuperAdmin } from "@/lib/admin";
 import { authConfig } from "@/auth.config";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      role: UserRole;
+      accountStatus: AccountStatus;
     } & DefaultSession["user"];
   }
 }
@@ -41,19 +44,41 @@ const providers: Provider[] = [
       const { email, password } = parsed.data;
       await dbConnect();
 
+      // One-shot RBAC bootstrap. Idempotent. Promotes the demo
+      // account (or, on Atlas, the earliest registered user) to
+      // super_admin if no super_admin exists yet — this is the
+      // upgrade path for workspaces that signed up before RBAC
+      // shipped, so the workspace owner doesn't get permanently
+      // locked out of /admin.
+      try {
+        await ensureDemoSuperAdmin();
+      } catch (err) {
+        console.warn("[auth] ensureSuperAdmin bootstrap failed", err);
+      }
+
       const user = await User.findOne({ email })
-        .select("+passwordHash name email image")
+        .select("+passwordHash name email image role status")
         .lean();
       if (!user?.passwordHash) return null;
 
       const ok = await bcrypt.compare(password, user.passwordHash);
       if (!ok) return null;
 
+      // Block suspended accounts hard. Pending accounts CAN log in
+      // (we surface an "awaiting approval" screen client-side) so
+      // they can see they've signed up successfully and the super
+      // admin can find them via /admin.
+      if (user.status === "suspended") {
+        throw new Error("Your account has been suspended. Contact your admin.");
+      }
+
       return {
         id: String(user._id),
         name: user.name,
         email: user.email,
         image: user.image ?? null,
+        role: (user.role ?? "member") as UserRole,
+        accountStatus: (user.status ?? "active") as AccountStatus,
       };
     },
   }),

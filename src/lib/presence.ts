@@ -56,13 +56,13 @@ export async function getWorkspacePresence(
 
   const users = await User.find(
     { _id: { $in: memberIds } },
-    { lastSeenAt: 1, status: 1 }
+    { lastSeenAt: 1, presenceText: 1 }
   ).lean();
 
   return users.map((u) => ({
     userId: String(u._id),
     state: presenceFromLastSeen(u.lastSeenAt as Date | null),
     lastSeenAt: (u.lastSeenAt as Date | null) ?? null,
-    status: (u.status as string | null) ?? null,
+    status: (u.presenceText as string | null) ?? null,
   }));
 }

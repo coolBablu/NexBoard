@@ -12,7 +12,7 @@
 
 import bcrypt from "bcryptjs";
 
-import { User } from "../models/User";
+import { User, defaultPermissionsFor } from "../models/User";
 import { Workspace } from "../models/Workspace";
 import { Project } from "../models/Project";
 import { Task } from "../models/Task";
@@ -84,6 +84,19 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
   const now = new Date();
   const minutesAgo = (n: number) => new Date(now.getTime() - n * 60_000);
 
+  const memberDefaults = {
+    status: "active" as const,
+    role: "member" as const,
+    permissions: defaultPermissionsFor("member"),
+    approvedAt: now,
+  };
+  const adminDefaults = {
+    status: "active" as const,
+    role: "admin" as const,
+    permissions: defaultPermissionsFor("admin"),
+    approvedAt: now,
+  };
+
   const [demoUser, maya, daniel, sara, jordan, aisha] = await User.create([
     {
       name: "Alex Chen",
@@ -93,7 +106,11 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
       title: "Head of Product",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Nova",
       lastSeenAt: now,
-      status: "🚀 shipping",
+      presenceText: "🚀 shipping",
+      role: "super_admin",
+      status: "active",
+      approvedAt: now,
+      permissions: defaultPermissionsFor("super_admin"),
     },
     {
       name: "Maya Okonkwo",
@@ -102,7 +119,8 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
       title: "Design Director",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maya",
       lastSeenAt: minutesAgo(0.5), // online
-      status: "🎨 deep work",
+      presenceText: "🎨 deep work",
+      ...adminDefaults,
     },
     {
       name: "Daniel Park",
@@ -111,7 +129,8 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
       title: "Engineering Lead",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Daniel",
       lastSeenAt: minutesAgo(1),
-      status: null,
+      presenceText: null,
+      ...adminDefaults,
     },
     {
       name: "Sara Patel",
@@ -120,7 +139,8 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
       title: "Staff PM",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sara",
       lastSeenAt: minutesAgo(4), // away
-      status: "📞 customer call",
+      presenceText: "📞 customer call",
+      ...memberDefaults,
     },
     {
       name: "Jordan Reyes",
@@ -129,7 +149,8 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
       title: "VP Engineering",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
       lastSeenAt: minutesAgo(120), // offline
-      status: null,
+      presenceText: null,
+      ...memberDefaults,
     },
     {
       name: "Aisha Khan",
@@ -138,7 +159,8 @@ export async function seedDemoData(opts: SeedOptions = {}): Promise<void> {
       title: "Chief of Staff",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha",
       lastSeenAt: minutesAgo(0.2),
-      status: "🌴 OOO Fri",
+      presenceText: "🌴 OOO Fri",
+      ...memberDefaults,
     },
   ]);
 

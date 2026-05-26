@@ -30,7 +30,15 @@ export async function GET(req: Request) {
     const memberIds = (ws.members ?? []).map((m) => m.user);
     const users = await User.find(
       { _id: { $in: memberIds } },
-      { name: 1, email: 1, image: 1, handle: 1, title: 1, lastSeenAt: 1, status: 1 }
+      {
+        name: 1,
+        email: 1,
+        image: 1,
+        handle: 1,
+        title: 1,
+        lastSeenAt: 1,
+        presenceText: 1,
+      }
     ).lean();
 
     const memberMeta = new Map(
@@ -52,7 +60,7 @@ export async function GET(req: Request) {
         handle,
         title: u.title || null,
         role: meta?.role || "member",
-        status: u.status || null,
+        status: u.presenceText || null,
         presence: presenceFromLastSeen(u.lastSeenAt as Date | null),
         lastSeenAt: u.lastSeenAt || null,
       };

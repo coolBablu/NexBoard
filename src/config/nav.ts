@@ -8,6 +8,7 @@ import {
   Calendar,
   Folder,
   MessagesSquare,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,6 +17,8 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   badge?: string;
+  /** Only render when the current session has one of these roles. */
+  requiresRole?: ("super_admin" | "admin")[];
 }
 
 export interface NavGroup {
@@ -45,6 +48,17 @@ export const navGroups: NavGroup[] = [
     label: "Intelligence",
     items: [
       { label: "AI Assistant", href: "/assistant", icon: Sparkles, badge: "New" },
+    ],
+  },
+  {
+    label: "Admin",
+    items: [
+      {
+        label: "Members",
+        href: "/admin",
+        icon: Shield,
+        requiresRole: ["super_admin"],
+      },
     ],
   },
   {
