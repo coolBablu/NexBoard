@@ -433,7 +433,6 @@ function ChannelsSidebar({
 function ChannelArea({ channel }: { channel: ChannelDTO | null }) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
-  const userRole = (session?.user as { role?: string } | undefined)?.role ?? null;
   const key = channel ? `/api/channels/${channel.id}/messages` : null;
   const { data, isLoading } = useSWR<{ messages: MessageDTO[] }>(key, {
     refreshInterval: 4_000,
@@ -578,7 +577,6 @@ function ChannelArea({ channel }: { channel: ChannelDTO | null }) {
                   message={m}
                   collapsed={sameAuthor}
                   currentUserId={currentUserId}
-                  userRole={userRole}
                   members={members}
                   channelId={channel.id}
                 />
@@ -653,21 +651,20 @@ function ChatMessage({
   message,
   collapsed,
   currentUserId,
-  userRole,
   members,
   channelId,
 }: {
   message: MessageDTO;
   collapsed: boolean;
   currentUserId?: string | null;
-  userRole?: string | null;
   members: Member[];
   channelId: string;
 }) {
   const isMentioned =
     currentUserId && message.mentions?.includes(currentUserId);
-  const isOwn = currentUserId && message.author.id === currentUserId;
-  const canDelete = isOwn || userRole === "super_admin";
+  // Strictly author-only — even super admins can't edit or delete
+  // someone else's message inside a channel.
+  const isOwn = !!currentUserId && message.author.id === currentUserId;
 
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState(message.body);
@@ -867,32 +864,28 @@ function ChatMessage({
         )}
       </div>
 
-      {/* Hover-visible action toolbar — sits at the top-right of the bubble. */}
-      {!editing && (isOwn || canDelete) && (
+      {/* Hover-visible action toolbar — only shown on YOUR own messages. */}
+      {!editing && isOwn && (
         <div className="pointer-events-none absolute -top-2 right-2 flex items-center gap-0.5 rounded-md border border-foreground/[0.08] bg-background/95 px-0.5 py-0.5 opacity-0 shadow-sm backdrop-blur transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
-          {isOwn && (
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              title="Edit message"
-              aria-label="Edit message"
-              className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
-            >
-              <Pencil className="size-3" />
-            </button>
-          )}
-          {canDelete && (
-            <button
-              type="button"
-              onClick={() => void deleteMessage()}
-              disabled={busy}
-              title="Delete message"
-              aria-label="Delete message"
-              className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300"
-            >
-              <Trash2 className="size-3" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            title="Edit message"
+            aria-label="Edit message"
+            className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
+          >
+            <Pencil className="size-3" />
+          </button>
+          <button
+            type="button"
+            onClick={() => void deleteMessage()}
+            disabled={busy}
+            title="Delete message"
+            aria-label="Delete message"
+            className="grid size-6 place-items-center rounded text-muted-foreground transition-colors hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300"
+          >
+            <Trash2 className="size-3" />
+          </button>
         </div>
       )}
     </motion.div>

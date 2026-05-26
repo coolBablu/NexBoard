@@ -223,14 +223,32 @@ async function run() {
   if (peerDelRes.status() === 403) ok("peer correctly blocked from deleting");
   else fail(`expected 403, got ${peerDelRes.status()}`);
 
-  step(16, "alex deletes his own DM message");
+  step(16, "super-admin (alex) CANNOT delete peer's message — author-only");
+  // Find a message authored by the peer (their DM reply from step 7).
+  const peerMsg = (afterDel => afterDel.messages?.find((m) => m.author.id === peerUser.id))(
+    await (await alexCtx.get(`${BASE}/api/channels/${dm.id}/messages`)).json()
+  );
+  if (!peerMsg) {
+    fail("peer's message not found for admin-delete test");
+  } else {
+    const adminDelOther = await alexCtx.delete(
+      `${BASE}/api/channels/${dm.id}/messages/${peerMsg.id}`
+    );
+    if (adminDelOther.status() === 403) {
+      ok("super-admin correctly blocked from deleting peer's message (author-only)");
+    } else {
+      fail(`expected 403, got ${adminDelOther.status()} — moderation override should not exist`);
+    }
+  }
+
+  step(17, "alex deletes his own DM message");
   const delRes = await alexCtx.delete(
     `${BASE}/api/channels/${dm.id}/messages/${ownMsg.id}`
   );
   if (delRes.status() === 200) ok("delete ok");
   else fail(`delete returned ${delRes.status()}`);
 
-  step(17, "deleted message is gone from the listing");
+  step(18, "deleted message is gone from the listing");
   const afterDel = await (
     await alexCtx.get(`${BASE}/api/channels/${dm.id}/messages`)
   ).json();
