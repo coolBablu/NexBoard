@@ -83,7 +83,7 @@ const impactStyles = {
 
 export function SmartRecommendations() {
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
+    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
       <div className="flex items-center justify-between border-b border-white/[0.06] p-4 sm:p-5">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -107,8 +107,7 @@ export function SmartRecommendations() {
             <motion.div
               key={r.id}
               initial={{ opacity: 0, x: -8 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.06 }}
               className="group/rec relative flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-white/[0.02] sm:px-5"
             >

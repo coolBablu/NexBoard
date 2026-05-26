@@ -230,8 +230,7 @@ export function CalendarWidget() {
             <motion.li
               key={i}
               initial={{ opacity: 0, x: -6 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.06 }}
               className={cn(
                 "flex items-center gap-3 rounded-lg border-l-2 bg-white/[0.02] px-3 py-2 transition-colors hover:bg-white/[0.04]",

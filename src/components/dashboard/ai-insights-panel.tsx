@@ -101,7 +101,7 @@ const toneMap = {
 
 export function AIInsightsPanel() {
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
+    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
       {/* aurora wash */}
       <div
         aria-hidden
@@ -143,8 +143,7 @@ export function AIInsightsPanel() {
             <motion.div
               key={ins.id}
               initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.5 }}
               className={`group/ins relative overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-br ${t.bg} p-3.5`}
             >
@@ -185,8 +184,7 @@ export function AIInsightsPanel() {
               <div className="mt-3 h-px overflow-hidden rounded-full bg-white/[0.06]">
                 <motion.div
                   initial={{ width: 0 }}
-                  whileInView={{ width: `${ins.confidence}%` }}
-                  viewport={{ once: true }}
+                  animate={{ width: `${ins.confidence}%` }}
                   transition={{
                     delay: 0.2 + i * 0.08,
                     duration: 1,

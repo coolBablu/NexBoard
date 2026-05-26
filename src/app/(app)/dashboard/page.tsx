@@ -77,8 +77,11 @@ function DashboardBody() {
         />
       </div>
 
-      {/* Main grid: 8 + 4 split */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      {/* Main grid: 8 + 4 split. `items-start` keeps each column at
+          its natural height — otherwise grid stretches the shorter
+          column to match the taller one and any card with h-full
+          inside it visibly bloats to fill the empty space. */}
+      <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
         {/* Left column (8) */}
         <div className="space-y-6 lg:col-span-8">
           <ProductivityChart />
