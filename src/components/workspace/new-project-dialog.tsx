@@ -99,14 +99,21 @@ export function NewProjectDialog({ onCreated, trigger }: NewProjectDialogProps) 
             </Dialog.Overlay>
             <Dialog.Content asChild>
               <motion.div
-                initial={{ opacity: 0, scale: 0.96, y: 8 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="fixed left-1/2 top-1/2 z-50 w-[92vw] max-w-lg -translate-x-1/2 -translate-y-1/2"
+                // Centering via motion's `x`/`y` style — Framer Motion
+                // merges these into the same `transform` string as the
+                // animated `scale`, so the dialog stays pinned to
+                // viewport center. Tailwind's `-translate-*` classes
+                // are ignored here because motion writes its own inline
+                // transform every frame.
+                style={{ x: "-50%", y: "-50%" }}
+                className="fixed left-1/2 top-1/2 z-50 w-[92vw] max-w-lg max-h-[calc(100dvh-2rem)]"
               >
-                <div className="glass-strong overflow-hidden rounded-2xl">
-                  <header className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                <div className="glass-strong flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden rounded-2xl">
+                  <header className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-5 py-4">
                     <Dialog.Title className="font-display text-lg font-semibold">
                       Create new project
                     </Dialog.Title>
@@ -120,7 +127,10 @@ export function NewProjectDialog({ onCreated, trigger }: NewProjectDialogProps) 
                     </Dialog.Close>
                   </header>
 
-                  <form onSubmit={onSubmit} className="space-y-5 p-5">
+                  <form
+                    onSubmit={onSubmit}
+                    className="flex-1 space-y-5 overflow-y-auto p-5"
+                  >
                     <div className="space-y-2">
                       <Label htmlFor="name">Project name</Label>
                       <Input

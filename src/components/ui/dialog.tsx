@@ -38,7 +38,10 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-white/10 bg-background/95 p-6 shadow-2xl backdrop-blur-2xl outline-none",
+        // Centered via 50%/translate AND capped to viewport so the
+        // dialog never overflows the screen (which used to push tall
+        // forms below the fold and look "not centered").
+        "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-border bg-background/95 p-6 shadow-2xl backdrop-blur-2xl outline-none max-h-[calc(100dvh-2rem)] overflow-y-auto",
         "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
         "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
         className
