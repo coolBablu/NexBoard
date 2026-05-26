@@ -25,7 +25,7 @@ export function CTA() {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="xl" className="w-full sm:w-auto">
-                <Link href="/signup">
+                <Link href="/login">
                   Start free trial
                   <ArrowRight className="size-4" />
                 </Link>

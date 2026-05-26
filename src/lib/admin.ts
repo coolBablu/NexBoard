@@ -5,6 +5,32 @@ import { dbConnect } from "@/lib/mongodb";
 import { User, defaultPermissionsFor } from "@/models/User";
 
 /**
+ * Resolve the allowed email domain for admin invites.
+ *
+ * Precedence:
+ *   1. `INVITE_EMAIL_DOMAIN` env var (e.g. "novaflow.com")
+ *   2. The super admin's own email domain (e.g. demo@novaflow.app → "novaflow.app")
+ *   3. `null` — no domain restriction (anything goes)
+ */
+export function resolveInviteDomain(adminEmail?: string | null): string | null {
+  const fromEnv = process.env.INVITE_EMAIL_DOMAIN?.trim().toLowerCase();
+  if (fromEnv) return fromEnv.replace(/^@/, "");
+  if (adminEmail) {
+    const at = adminEmail.lastIndexOf("@");
+    if (at >= 0) return adminEmail.slice(at + 1).toLowerCase();
+  }
+  return null;
+}
+
+/** Returns true if `email` matches `domain` (case-insensitive). */
+export function emailMatchesDomain(email: string, domain: string | null) {
+  if (!domain) return true;
+  const at = email.lastIndexOf("@");
+  if (at < 0) return false;
+  return email.slice(at + 1).toLowerCase() === domain.toLowerCase();
+}
+
+/**
  * Always re-fetch the user's role from the DB rather than trusting the
  * JWT — admin-only endpoints are the most security-sensitive surface
  * in the app, and we'd rather pay one query than ship a stale role.

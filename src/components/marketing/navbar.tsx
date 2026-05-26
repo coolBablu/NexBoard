@@ -56,12 +56,9 @@ export function MarketingNavbar() {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Sign in</Link>
-          </Button>
           <Button asChild size="sm">
-            <Link href="/signup">
-              Get started
+            <Link href="/login">
+              Sign in
               <ArrowRight className="size-3.5" />
             </Link>
           </Button>
@@ -97,11 +94,11 @@ export function MarketingNavbar() {
               ))}
             </ul>
             <div className="mt-3 flex gap-2 border-t border-white/[0.07] pt-3">
-              <Button asChild variant="secondary" className="flex-1">
-                <Link href="/login">Sign in</Link>
-              </Button>
               <Button asChild className="flex-1">
-                <Link href="/signup">Get started</Link>
+                <Link href="/login">
+                  Sign in
+                  <ArrowRight className="size-3.5" />
+                </Link>
               </Button>
             </div>
           </div>

@@ -178,7 +178,7 @@ function PricingCard({
         size="lg"
         className="mt-6"
       >
-        <Link href={tier.monthly === null ? "#" : "/signup"}>{tier.cta}</Link>
+        <Link href={tier.monthly === null ? "#" : "/login"}>{tier.cta}</Link>
       </Button>
 
       <ul className="mt-8 space-y-3">

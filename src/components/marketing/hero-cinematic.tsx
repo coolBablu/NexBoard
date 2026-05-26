@@ -141,7 +141,7 @@ export function HeroCinematic() {
                   size="lg"
                   className="relative w-full overflow-hidden shadow-glow sm:w-auto"
                 >
-                  <Link href="/signup">
+                  <Link href="/login">
                     <span className="relative z-10 flex items-center gap-2">
                       Start free
                       <ArrowRight className="size-4" />

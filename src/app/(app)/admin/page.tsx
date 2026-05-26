@@ -581,6 +581,14 @@ function InviteDialog({
 }) {
   const [busy, setBusy] = React.useState(false);
   const [tempPassword, setTempPassword] = React.useState<string | null>(null);
+  const [emailHandle, setEmailHandle] = React.useState("");
+  const { data: cfg } = useSWR<{ inviteDomain: string | null }>(
+    "/api/admin/config"
+  );
+  const inviteDomain = cfg?.inviteDomain ?? null;
+  const composedEmail = inviteDomain
+    ? `${emailHandle.trim()}@${inviteDomain}`
+    : emailHandle.trim();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -588,13 +596,16 @@ function InviteDialog({
     setTempPassword(null);
     const fd = new FormData(e.currentTarget);
     const form = e.currentTarget;
+    const email = inviteDomain
+      ? composedEmail
+      : String(fd.get("email") || "").trim();
     try {
       const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: String(fd.get("name") || ""),
-          email: String(fd.get("email") || ""),
+          email,
           role: String(fd.get("role") || "member"),
         }),
       });
@@ -610,6 +621,7 @@ function InviteDialog({
         setTempPassword(data.temporaryPassword);
       } else {
         form.reset();
+        setEmailHandle("");
         onCreated();
       }
     } catch (err) {
@@ -662,14 +674,42 @@ function InviteDialog({
               <Input id="name" name="name" placeholder="Maya Okonkwo" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Work email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="maya@acme.com"
-                required
-              />
+              <Label htmlFor="email">Company email</Label>
+              {inviteDomain ? (
+                <div className="flex items-stretch overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03] focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/15">
+                  <input
+                    id="email"
+                    name="emailHandle"
+                    autoComplete="off"
+                    placeholder="maya"
+                    required
+                    pattern="[a-zA-Z0-9._%+-]+"
+                    value={emailHandle}
+                    onChange={(e) =>
+                      setEmailHandle(
+                        e.target.value.toLowerCase().replace(/\s+/g, "")
+                      )
+                    }
+                    className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60"
+                  />
+                  <span className="grid place-items-center border-l border-white/[0.08] bg-white/[0.03] px-3 font-mono text-xs text-muted-foreground">
+                    @{inviteDomain}
+                  </span>
+                </div>
+              ) : (
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="maya@acme.com"
+                  required
+                />
+              )}
+              <p className="text-[11px] text-muted-foreground">
+                {inviteDomain
+                  ? `Only @${inviteDomain} addresses can be invited.`
+                  : "Any work email is allowed."}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>

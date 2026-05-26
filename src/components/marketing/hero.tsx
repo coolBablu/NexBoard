@@ -80,7 +80,7 @@ export function Hero() {
             className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
           >
             <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/signup">
+              <Link href="/login">
                 Start free
                 <ArrowRight className="size-4" />
               </Link>

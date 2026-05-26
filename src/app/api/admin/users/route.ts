@@ -6,7 +6,12 @@ import { dbConnect } from "@/lib/mongodb";
 import { User, defaultPermissionsFor, USER_ROLES } from "@/models/User";
 import { Workspace } from "@/models/Workspace";
 import { Notification } from "@/models/Notification";
-import { requireSuperAdmin, ensureDemoSuperAdmin } from "@/lib/admin";
+import {
+  requireSuperAdmin,
+  ensureDemoSuperAdmin,
+  resolveInviteDomain,
+  emailMatchesDomain,
+} from "@/lib/admin";
 import { badRequest, serverError } from "@/lib/api";
 import { presenceFromLastSeen } from "@/lib/presence";
 
@@ -129,6 +134,19 @@ export async function POST(req: Request) {
     }
     const { name, email, role } = parsed.data;
     const lower = email.toLowerCase();
+
+    // Enforce company email domain (if one is configured / derivable).
+    // Defaults to the super-admin's own domain so a workspace owned by
+    // alex@acme.com can only invite *@acme.com accounts.
+    const inviteDomain = resolveInviteDomain(actor.email);
+    if (!emailMatchesDomain(lower, inviteDomain)) {
+      return NextResponse.json(
+        {
+          error: `Use a company email — only @${inviteDomain} addresses can be invited.`,
+        },
+        { status: 422 }
+      );
+    }
 
     const existing = await User.findOne({ email: lower });
     if (existing) {

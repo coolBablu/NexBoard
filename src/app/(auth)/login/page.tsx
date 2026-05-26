@@ -192,14 +192,9 @@ function LoginForm() {
         </span>
       </button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        Don't have an account?{" "}
-        <Link
-          href="/signup"
-          className="font-medium text-foreground underline-offset-4 hover:underline"
-        >
-          Create one
-        </Link>
+      <p className="text-center text-xs text-muted-foreground">
+        Don&apos;t have an account? Ask your workspace admin to invite you —
+        self-serve sign-up is disabled.
       </p>
     </form>
   );

@@ -8,7 +8,6 @@ export const dynamic = "force-dynamic";
 import { dbConnect } from "@/lib/mongodb";
 import { User, defaultPermissionsFor } from "@/models/User";
 import { Workspace } from "@/models/Workspace";
-import { Notification } from "@/models/Notification";
 import { badRequest, serverError } from "@/lib/api";
 import { rateLimit, tooMany } from "@/lib/rate-limit";
 
@@ -24,8 +23,16 @@ const signupSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Only lowercase letters, numbers, and dashes"),
 });
 
+/**
+ * POST /api/signup
+ *
+ * Self-serve sign-up is permanently disabled in this app. The ONLY
+ * exception is the very first account ever created in the database,
+ * which bootstraps the workspace's super_admin. Every subsequent
+ * member must be invited from /admin by a super_admin.
+ */
 export async function POST(req: Request) {
-  // Brute-force protection: 5 signups / 10 minutes / IP.
+  // Brute-force protection: 5 attempts / 5 minutes / IP.
   const limited = rateLimit(req, { name: "signup", window: "5m", limit: 5 });
   if (!limited.ok) return tooMany(limited);
 
@@ -40,11 +47,14 @@ export async function POST(req: Request) {
 
     const { firstName, lastName, email, password, workspaceSlug } = parsed.data;
 
-    const existing = await User.findOne({ email: email.toLowerCase() }).lean();
-    if (existing) {
+    const userCount = await User.countDocuments();
+    if (userCount > 0) {
       return NextResponse.json(
-        { error: "An account with this email already exists." },
-        { status: 409 }
+        {
+          error:
+            "Self-serve sign-up is disabled. Ask your workspace admin to invite you from /admin.",
+        },
+        { status: 403 }
       );
     }
 
@@ -59,64 +69,31 @@ export async function POST(req: Request) {
     const passwordHash = await bcrypt.hash(password, 12);
     const name = `${firstName} ${lastName}`.trim();
 
-    // The very first account in the DB is bootstrapped as an active
-    // super_admin (the workspace owner). Every subsequent sign-up
-    // lands in `pending` and shows up in the /admin queue until a
-    // super_admin approves them.
-    const userCount = await User.countDocuments();
-    const isFirstUser = userCount === 0;
-    const role = isFirstUser ? "super_admin" : "member";
-    const status = isFirstUser ? "active" : "pending";
-
+    // Bootstrap path: first user is the workspace's super_admin.
     const user = await User.create({
       name,
       email: email.toLowerCase(),
       passwordHash,
-      role,
-      status,
-      approvedAt: isFirstUser ? new Date() : null,
-      permissions: defaultPermissionsFor(role),
+      role: "super_admin",
+      status: "active",
+      approvedAt: new Date(),
+      permissions: defaultPermissionsFor("super_admin"),
     });
 
     const workspace = await Workspace.create({
       name: `${firstName}'s workspace`,
       slug: workspaceSlug,
       owner: user._id,
-      members: [{ user: user._id, role: isFirstUser ? "owner" : "member" }],
+      members: [{ user: user._id, role: "owner" }],
     });
 
     user.defaultWorkspace = workspace._id;
     await user.save();
 
-    // Fire-and-forget: notify every super_admin that a new user is
-    // waiting for approval. They'll see it in their bell + /inbox.
-    if (!isFirstUser) {
-      try {
-        const admins = await User.find({ role: "super_admin" }, { _id: 1 }).lean();
-        if (admins.length) {
-          await Notification.insertMany(
-            admins.map((a) => ({
-              recipient: a._id,
-              workspace: workspace._id,
-              actor: user._id,
-              kind: "project_invite",
-              priority: "high",
-              title: `${name} wants to join your workspace`,
-              body: `${email} just signed up. Approve or assign a role from Admin.`,
-              entity: { type: "user", id: user._id },
-              url: "/admin?tab=pending",
-            }))
-          );
-        }
-      } catch (err) {
-        console.warn("[signup] could not notify admins", err);
-      }
-    }
-
     return NextResponse.json(
       {
         ok: true,
-        pending: status === "pending",
+        bootstrap: true,
         user: {
           id: String(user._id),
           email: user.email,
