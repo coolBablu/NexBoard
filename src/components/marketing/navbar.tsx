@@ -123,7 +123,7 @@ export function MarketingNavbar() {
                       layoutId="nav-active-pill"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       aria-hidden
-                      className="absolute inset-0 rounded-full border border-violet-500/60 bg-violet-500/[0.04] dark:border-violet-400/60 dark:bg-violet-400/[0.06]"
+                      className="absolute inset-0 rounded-full border border-violet-500/60 bg-white dark:border-violet-400/60 dark:bg-white/[0.04]"
                     />
                   )}
                   <span className="relative">{link.label}</span>
