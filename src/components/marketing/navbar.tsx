@@ -95,9 +95,12 @@ export function MarketingNavbar() {
       <nav
         className={cn(
           "flex w-full max-w-6xl items-center justify-between rounded-2xl border px-3 py-2.5 transition-all duration-500",
+          // Always-solid white shell so the bar stays readable on both
+          // the dark center glow and the light sections below.
+          "border-foreground/[0.08] bg-white/95 backdrop-blur-2xl",
           scrolled
-            ? "border-white/10 bg-background/70 backdrop-blur-2xl shadow-[0_10px_40px_-12px_rgba(15, 23, 42, 0.06)]"
-            : "border-transparent bg-transparent"
+            ? "shadow-[0_18px_60px_-24px_rgba(15,23,42,0.20)]"
+            : "shadow-[0_8px_24px_-16px_rgba(15,23,42,0.10)]"
         )}
       >
         <Logo size="sm" />
@@ -144,7 +147,7 @@ export function MarketingNavbar() {
 
         <button
           onClick={() => setOpen((o) => !o)}
-          className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-foreground"
+          className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-foreground/[0.08] text-foreground"
           aria-label="Toggle menu"
         >
           {open ? <X className="size-4" /> : <Menu className="size-4" />}

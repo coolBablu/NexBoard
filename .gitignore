@@ -44,5 +44,7 @@ build-out.txt
 # local screenshot output / scratch files
 /screens
 /dialog-screens
+/hero-screens
+/theme-screens
 /snap-*.png
 .commit-msg.txt
