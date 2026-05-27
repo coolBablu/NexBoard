@@ -15,8 +15,8 @@
 
 @layer base {
   :root {
-    /* Soft off-white background — easier on projector eyes than #FFF */
-    --background: 240 20% 99%;
+    /* Pure white background */
+    --background: 0 0% 100%;
     --foreground: 240 10% 12%;
 
     --card: 0 0% 100%;
@@ -114,26 +114,10 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Light-mode body: soft indigo/sky tinted gradients */
+  /* Light-mode body: clean white, no tinted gradients. */
   body {
     background-color: hsl(var(--background));
-    background-image:
-      radial-gradient(
-        ellipse 80% 50% at 50% -20%,
-        rgba(94, 106, 210, 0.08),
-        transparent
-      ),
-      radial-gradient(
-        ellipse 60% 50% at 100% 0%,
-        rgba(14, 165, 233, 0.06),
-        transparent
-      ),
-      radial-gradient(
-        ellipse 50% 40% at 0% 100%,
-        rgba(94, 106, 210, 0.04),
-        transparent
-      );
-    background-attachment: fixed;
+    background-image: none;
     min-height: 100vh;
   }
 
