@@ -11,6 +11,8 @@ import {
   Search,
   Command,
   ArrowUpRight,
+  Paperclip,
+  Send,
 } from "lucide-react";
 import { Reveal } from "@/components/effects/reveal";
 import { MouseGlow } from "@/components/effects/mouse-glow";
@@ -172,11 +174,19 @@ function BentoCard({
           }}
         />
 
-        <div className="relative flex flex-col gap-3 p-6 sm:p-7">
+        <div
+          className={cn(
+            "relative flex flex-col gap-3 p-6 sm:p-7",
+            // Slightly tighter bottom padding when a preview follows so
+            // the header section and the preview feel like one unit
+            // instead of two stacked panels with a gap between them.
+            children && "pb-4 sm:pb-5"
+          )}
+        >
           <div className="flex items-start justify-between">
             <div
               className={cn(
-                "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]",
+                "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-foreground/[0.08] bg-foreground/[0.03]",
                 iconColor
               )}
             >
@@ -194,7 +204,9 @@ function BentoCard({
         </div>
 
         {children && (
-          <div className="relative mt-auto flex-1 px-6 pb-6 sm:px-7 sm:pb-7">
+          // flex-1 lets the preview stretch to fill the card; without
+          // mt-auto the preview rides up directly under the description.
+          <div className="relative flex flex-1 flex-col px-6 pb-6 sm:px-7 sm:pb-7">
             {children}
           </div>
         )}
@@ -206,25 +218,51 @@ function BentoCard({
 /* ─────────────────────────── per-card previews ─────────────────────────── */
 
 function NovaChatPreview() {
-  const messages = [
+  // A longer, more realistic conversation so the preview actually fills
+  // its 2-row bento slot instead of leaving a huge white void below.
+  const messages: { role: "user" | "assistant"; text: string }[] = [
     { role: "user", text: "Summarize this week's shipping risks." },
     {
       role: "assistant",
       text: "3 risks. Payments v2 webhooks lack retry tests. Stripe Tax flag undecided. Loom integration blocked on OAuth.",
     },
     { role: "user", text: "Draft a status update for the team." },
+    {
+      role: "assistant",
+      text: "Drafted in #eng-updates. Tagged Daniel for the webhook tests and asked for a Tax decision by Friday.",
+    },
   ];
   return (
-    <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-background/40">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(94, 106, 210,0.18),transparent_60%)]" />
-      <div className="relative space-y-2 p-4">
+    <div className="relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-2xl border border-foreground/[0.06] bg-background/40">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(94, 106, 210,0.18),transparent_60%)]" />
+
+      {/* Header strip — anchors the chat so it doesn't look floating. */}
+      <div className="relative flex items-center justify-between border-b border-foreground/[0.06] px-4 py-2.5">
+        <div className="flex items-center gap-2">
+          <div className="grid size-6 place-items-center rounded-md bg-nova-gradient text-white">
+            <Sparkles className="size-3" />
+          </div>
+          <div className="text-[11px] font-medium text-foreground/80">
+            Nova
+            <span className="ml-1.5 text-muted-foreground/80">
+              · context: Sprint 24
+            </span>
+          </div>
+        </div>
+        <span className="font-mono text-[10px] text-muted-foreground/70">
+          ⌘K
+        </span>
+      </div>
+
+      {/* Scroll-shaped messages region — flex-1 so it expands to fill. */}
+      <div className="relative flex-1 space-y-2.5 overflow-hidden p-4">
         {messages.map((m, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 + i * 0.18, duration: 0.5 }}
+            transition={{ delay: 0.2 + i * 0.16, duration: 0.5 }}
             className={cn(
               "flex",
               m.role === "user" ? "justify-end" : "justify-start"
@@ -234,12 +272,12 @@ function NovaChatPreview() {
               className={cn(
                 "max-w-[78%] rounded-2xl px-3 py-2 text-xs leading-relaxed",
                 m.role === "user"
-                  ? "bg-white/[0.06] text-foreground/90"
-                  : "bg-violet-500/12 text-foreground/90 border border-violet-500/20"
+                  ? "border border-foreground/[0.06] bg-foreground/[0.04] text-foreground/90"
+                  : "border border-violet-500/20 bg-violet-500/10 text-foreground/90"
               )}
             >
               {m.role === "assistant" && (
-                <div className="mb-1 inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-violet-300/80">
+                <div className="mb-1 inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-violet-500/90 dark:text-violet-300/80">
                   <Sparkles className="size-2.5" /> Nova
                 </div>
               )}
@@ -247,7 +285,7 @@ function NovaChatPreview() {
             </div>
           </motion.div>
         ))}
-        {/* Typing indicator */}
+        {/* Typing dots — keeps the conversation feeling live. */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -255,11 +293,11 @@ function NovaChatPreview() {
           transition={{ delay: 1.2 }}
           className="flex justify-start"
         >
-          <div className="flex items-center gap-1 rounded-2xl border border-violet-500/20 bg-violet-500/12 px-3 py-2">
+          <div className="flex items-center gap-1 rounded-2xl border border-violet-500/20 bg-violet-500/10 px-3 py-2">
             {[0, 1, 2].map((i) => (
               <motion.span
                 key={i}
-                className="size-1.5 rounded-full bg-violet-300"
+                className="size-1.5 rounded-full bg-violet-500 dark:bg-violet-300"
                 animate={{ opacity: [0.3, 1, 0.3] }}
                 transition={{
                   duration: 1,
@@ -272,44 +310,113 @@ function NovaChatPreview() {
           </div>
         </motion.div>
       </div>
+
+      {/* Composer — gives the chat a real bottom edge so the card no
+          longer trails off into empty space. */}
+      <div className="relative border-t border-foreground/[0.06] p-3">
+        <div className="flex items-center gap-2 rounded-xl border border-foreground/[0.08] bg-background/60 px-2.5 py-1.5">
+          <Sparkles className="size-3.5 text-violet-500 dark:text-violet-300" />
+          <span className="flex-1 truncate text-[11px] text-muted-foreground/80">
+            Ask Nova about Sprint 24, drafts, or files…
+          </span>
+          <Paperclip className="size-3.5 text-muted-foreground/70" />
+          <button
+            type="button"
+            className="grid size-6 place-items-center rounded-md bg-nova-gradient text-white shadow-sm"
+            aria-label="Send"
+          >
+            <Send className="size-3" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
 function KanbanPreview() {
-  const cols = [
-    { name: "Doing", tone: "from-cyan-500/20" },
-    { name: "Review", tone: "from-violet-500/20" },
-    { name: "Done", tone: "from-emerald-500/20" },
+  // Per-column card counts vary so the board reads as a real workflow
+  // (work in progress > review > done is the common shape).
+  const cols: {
+    name: string;
+    tone: string;
+    accent: string;
+    cards: { tag: string; width: string }[];
+  }[] = [
+    {
+      name: "Doing",
+      tone: "from-cyan-500/15",
+      accent: "bg-cyan-500/80",
+      cards: [
+        { tag: "Auth flow", width: "w-3/5" },
+        { tag: "Billing v2", width: "w-2/3" },
+        { tag: "Onboarding", width: "w-1/2" },
+      ],
+    },
+    {
+      name: "Review",
+      tone: "from-violet-500/15",
+      accent: "bg-violet-500/80",
+      cards: [
+        { tag: "Pricing copy", width: "w-3/5" },
+        { tag: "Webhooks", width: "w-1/2" },
+      ],
+    },
+    {
+      name: "Done",
+      tone: "from-emerald-500/15",
+      accent: "bg-emerald-500/80",
+      cards: [
+        { tag: "Dark mode", width: "w-2/3" },
+        { tag: "Analytics", width: "w-1/2" },
+        { tag: "Sentry sync", width: "w-3/5" },
+        { tag: "Bento grid", width: "w-2/5" },
+      ],
+    },
   ];
+
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid h-full min-h-[260px] grid-cols-3 gap-2">
       {cols.map((c, ci) => (
         <div
           key={c.name}
           className={cn(
-            "rounded-xl border border-white/[0.06] bg-gradient-to-b to-transparent p-2",
+            "flex flex-col rounded-xl border border-foreground/[0.06] bg-gradient-to-b to-transparent p-2",
             c.tone
           )}
         >
-          <div className="mb-2 text-[10px] font-medium text-foreground/70">
-            {c.name}
+          <div className="mb-2 flex items-center justify-between px-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className={cn("size-1.5 rounded-full", c.accent)} />
+              <span className="text-[10px] font-medium text-foreground/70">
+                {c.name}
+              </span>
+            </div>
+            <span className="font-mono text-[9px] text-muted-foreground/70">
+              {c.cards.length}
+            </span>
           </div>
-          <div className="space-y-1.5">
-            {Array.from({ length: 2 }).map((_, ti) => (
+          <div className="flex-1 space-y-1.5">
+            {c.cards.map((card, ti) => (
               <motion.div
-                key={ti}
+                key={card.tag}
                 initial={{ opacity: 0, x: -6 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: ci * 0.12 + ti * 0.1 }}
-                className="rounded-lg border border-white/[0.06] bg-white/[0.04] p-2"
+                transition={{ delay: ci * 0.08 + ti * 0.08 }}
+                className="rounded-lg border border-foreground/[0.06] bg-background/60 p-2 shadow-sm"
               >
-                <div className="h-1 w-3/5 rounded-full bg-white/15" />
-                <div className="mt-1.5 h-1 w-2/5 rounded-full bg-white/8" />
-                <div className="mt-2 flex items-center gap-1">
-                  <div className="size-3 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500" />
-                  <div className="size-3 -ml-1 rounded-full bg-gradient-to-br from-fuchsia-500 to-amber-300" />
+                <div
+                  className={cn("h-1 rounded-full bg-foreground/15", card.width)}
+                />
+                <div className="mt-1.5 h-1 w-2/5 rounded-full bg-foreground/[0.08]" />
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <div className="size-3 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500" />
+                    <div className="size-3 -ml-1 rounded-full bg-gradient-to-br from-fuchsia-500 to-amber-300" />
+                  </div>
+                  <span className="font-mono text-[9px] text-muted-foreground/60">
+                    {card.tag}
+                  </span>
                 </div>
               </motion.div>
             ))}
