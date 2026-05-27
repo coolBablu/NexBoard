@@ -66,7 +66,11 @@ export function HeroCinematic() {
   return (
     <section
       ref={containerRef}
-      className="relative isolate min-h-[100svh] overflow-hidden pt-36 pb-24 sm:pt-44"
+      // `dark` flips every CSS variable inside this section to the
+      // midnight theme — surrounding sections stay light. The explicit
+      // bg/text classes then resolve to the dark tokens so the section
+      // actually paints dark.
+      className="dark relative isolate min-h-[100svh] overflow-hidden bg-background pt-36 pb-24 text-foreground sm:pt-44"
     >
       {/* Mouse-tracked orb */}
       <motion.div
@@ -85,6 +89,12 @@ export function HeroCinematic() {
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,transparent_30%,hsl(var(--background))_85%)]"
+      />
+      {/* Soft bottom seam: fades the dark hero into the light section
+          beneath instead of a hard color cliff. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-white"
       />
 
       {/* Floating chips around headline */}
